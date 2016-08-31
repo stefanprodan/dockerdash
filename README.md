@@ -1,5 +1,8 @@
 # dockerdash
 
+[![Build status](https://ci.appveyor.com/api/projects/status/q52dkb8di4578mh9?svg=true)](https://ci.appveyor.com/project/stefanprodan/dockerdash)
+
+
 Docker dashboard built with ASP.NET Core, Docker.DotNet, SignalR and Vuejs.
 
 Compatible with Docker v1.12, requires docker socket to be mounted as a volume.
