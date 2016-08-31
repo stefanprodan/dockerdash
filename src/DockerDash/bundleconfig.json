@@ -1,0 +1,61 @@
+﻿// Configure bundling and minification for the project.
+// More info at https://go.microsoft.com/fwlink/?LinkId=808241
+[
+  {
+    "outputFileName": "wwwroot/css/site.min.css",
+    // An array of relative input file paths. Globbing patterns supported
+    "inputFiles": [
+      "wwwroot/css/site.css"
+    ]
+  },
+  {
+    "outputFileName": "wwwroot/app/lib.js",
+    "inputFiles": [
+      "wwwroot/lib/jquery/dist/jquery.min.js",
+      "wwwroot/lib/bootstrap/dist/js/bootstrap.min.js",
+      "wwwroot/lib/vue/dist/vue.min.js",
+      "wwwroot/lib/vue-router/dist/vue-router.min.js",
+      "wwwroot/lib/signalr/jquery.signalr-2.2.1.min.js",
+      "wwwroot/lib/chartjs/Chart.min.js"
+    ],
+    // Optionally specify minification options
+    "minify": {
+      "enabled": false,
+      "renameLocals": false
+    },
+    // Optinally generate .map file
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/app/app.js",
+    "inputFiles": [
+      "wwwroot/js/base.js",
+      "wwwroot/js/host.js",
+      "wwwroot/js/container.js",
+      "wwwroot/js/main.js"
+    ],
+    // Optionally specify minification options
+    "minify": {
+      "enabled": false,
+      "renameLocals": false
+    },
+    // Optinally generate .map file
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/app/app.min.js",
+    "inputFiles": [
+      "wwwroot/js/base.js",
+      "wwwroot/js/host.js",
+      "wwwroot/js/container.js",
+      "wwwroot/js/main.js"
+    ],
+    // Optionally specify minification options
+    "minify": {
+      "enabled": true,
+      "renameLocals": false
+    },
+    // Optinally generate .map file
+    "sourceMap": false
+  }
+]
