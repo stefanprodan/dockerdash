@@ -1,5 +1,7 @@
 FROM microsoft/dotnet:latest
 
+MAINTAINER Stefan Prodan
+
 # Set environment variables
 ENV ASPNETCORE_URLS="http://*:5050"
 ENV ASPNETCORE_ENVIRONMENT="Staging"
@@ -7,23 +9,25 @@ ENV ASPNETCORE_ENVIRONMENT="Staging"
 # Copy files to app directory
 COPY /src/Docker.DotNet /app/src/Docker.DotNet
 COPY /src/DockerDash /app/src/DockerDash
+
+# add myget aspnetmaster
 COPY NuGet.Config /app/src/DockerDash/NuGet.Config
 
-# RethinkDbLogProvider
+# Restore Docker.DotNet packages
 WORKDIR /app/src/Docker.DotNet
 RUN ["dotnet", "restore"]
 
 # Set working directory
 WORKDIR /app/src/DockerDash
 
-# Restore NuGet packages
+# Restore DockerDash packages
 RUN ["dotnet", "restore"]
 
-# Build the app
+# Build DockerDash
 RUN ["dotnet", "build"]
 
 # Open port
 EXPOSE 5050/tcp
 
-# Run the app
+# Run
 ENTRYPOINT ["dotnet", "run"]
