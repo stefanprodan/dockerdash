@@ -296,18 +296,34 @@
                                 <div class="about page-container">
                                     <ul>
                                         <li>
-                                            <small>Created:</small>
+                                            <small>Created at:</small>
                                             <span>{{ con.Created }}</span>
                                         </li>
-                                        <li>
+                                        <li v-if="con.FinishedAt">
+                                            <small>Finished at:</small>
+                                            <span>{{ con.FinishedAt }}</span>
+                                        </li>
+                                        <li v-if="con.Command">
                                             <small>Command:</small>
                                             <span>{{ con.Command }}</span>
+                                        </li>
+                                        <li v-if="con.Path">
+                                            <small>Path:</small>
+                                            <span>{{ con.Path }}</span>
+                                        </li>
+                                        <li v-for="entry in con.Entrypoint">
+                                            <small>Entrypoint:</small>
+                                            <span>{{ entry }}</span>
+                                        </li>
+                                        <li v-if="con.WorkingDir">
+                                            <small>WorkingDir:</small>
+                                            <span class="break">{{ con.WorkingDir}}</span>
                                         </li>
                                         <li v-for="env in con.Env">
                                             <small>Env:</small>
                                             <span class="break">{{ env }}</span>
                                         </li>
-                                        <li>
+                                        <li v-if="con.Ports">
                                             <small>Ports:</small>
                                             <span>{{ con.Ports }}</span>
                                         </li>
@@ -318,18 +334,6 @@
                                         <li v-for="mount in con.Mounts">
                                             <small>Mount:</small>
                                             <span class="break">{{ mount }}</span>
-                                        </li>
-                                        <li v-for="entry in con.Entrypoint">
-                                            <small>Entrypoint:</small>
-                                            <span>{{ entry }}</span>
-                                        </li>
-                                        <li v-if="con.WorkingDir">
-                                            <small>WorkingDir:</small>
-                                            <span class="break">{{ con.WorkingDir}}</span>
-                                        </li>
-                                        <li>
-                                            <small>Path:</small>
-                                            <span>{{ con.Path }}</span>
                                         </li>
                                         <li>
                                             <small>Driver:</small>

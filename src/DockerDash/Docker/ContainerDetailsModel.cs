@@ -27,6 +27,7 @@ namespace DockerDash
         public long RestartCount { get; set; }
         public string Driver { get; set; }
         public string StartedAt { get; set; }
+        public string FinishedAt { get; set; }
         public string Path { get; set; }
         public List<string> Mounts { get; set; }
         public List<string> Env { get; set; }

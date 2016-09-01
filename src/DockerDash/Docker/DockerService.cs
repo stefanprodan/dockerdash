@@ -275,7 +275,8 @@ namespace DockerDash
                 Driver = inspec.Driver,
                 RestartCount = inspec.RestartCount,
                 Path = inspec.Path,
-                StartedAt = Convert.ToDateTime(inspec.State.StartedAt).ToString("dd-MM-yy HH:mm"),
+                StartedAt = string.IsNullOrEmpty(inspec.State.StartedAt) ? null : Convert.ToDateTime(inspec.State.StartedAt).ToString("dd-MM-yy HH:mm"),
+                FinishedAt = string.IsNullOrEmpty(inspec.State.FinishedAt) ? null : Convert.ToDateTime(inspec.State.FinishedAt).ToString("dd-MM-yy HH:mm"),
                 Command = inspec.Args.Aggregate((current, next) => current + " " + next)
             };
 
@@ -300,7 +301,7 @@ namespace DockerDash
                 details.Mounts = new List<string>();
                 foreach (var m in inspec.Mounts)
                 {
-                    details.Mounts.Add($"Source: {m.Source} Destination: {m.Destination}");
+                    details.Mounts.Add($"{m.Source}:{m.Destination}");
                 }
             }
 
