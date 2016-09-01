@@ -20,7 +20,7 @@
     ready: function () {
         this.id = this.$route.params.id;
         var $this = this;
-        $.connection.hub.logging = true;
+
         this.mainHub.client.onContainerEvent = this.onContainerEvent;
         $.connection.hub.start().done(function () {
             $this.loadDetails();

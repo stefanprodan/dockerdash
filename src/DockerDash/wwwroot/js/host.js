@@ -14,14 +14,14 @@
     },
     ready: function () {
         var $this = this;
-        $.connection.hub.logging = true;
+
+        // subscribe to push events
         this.mainHub.client.onContainerEvent = this.onContainerEvent;
+
+        // connect to SignalR hub
         $.connection.hub.start().done(function () {
-            $this.loadHost();
-            $this.loadLists();
+            $this.loadData();
             $this.loaded = true;
-        }).fail(function () {
-            //log error
         });
     },
     methods: {
@@ -46,13 +46,15 @@
             var $this = this;
             this.mainHub.server.getImageList().then(function (images) {
                 $this.images = images;
+                $this.host.Images = images.length;
             });
         },
-        loadLists: function () {
+        loadData: function () {
+            this.loadHost();
             this.loadContainers();
             this.loadImages();
             if (this.timer) clearTimeout(this.timer);
-            this.timer = setTimeout(this.loadLists, 30000);
+            this.timer = setTimeout(this.loadData, 30000);
         }
     },
     route: {

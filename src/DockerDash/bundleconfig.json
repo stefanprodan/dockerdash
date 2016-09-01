@@ -1,9 +1,6 @@
-﻿// Configure bundling and minification for the project.
-// More info at https://go.microsoft.com/fwlink/?LinkId=808241
-[
+﻿[
   {
     "outputFileName": "wwwroot/css/site.min.css",
-    // An array of relative input file paths. Globbing patterns supported
     "inputFiles": [
       "wwwroot/css/site.css"
     ]
@@ -18,12 +15,10 @@
       "wwwroot/lib/signalr/jquery.signalr-2.2.1.min.js",
       "wwwroot/lib/chartjs/Chart.min.js"
     ],
-    // Optionally specify minification options
     "minify": {
       "enabled": false,
       "renameLocals": false
     },
-    // Optinally generate .map file
     "sourceMap": false
   },
   {
@@ -34,12 +29,10 @@
       "wwwroot/js/container.js",
       "wwwroot/js/main.js"
     ],
-    // Optionally specify minification options
     "minify": {
       "enabled": false,
       "renameLocals": false
     },
-    // Optinally generate .map file
     "sourceMap": false
   },
   {
@@ -50,12 +43,10 @@
       "wwwroot/js/container.js",
       "wwwroot/js/main.js"
     ],
-    // Optionally specify minification options
     "minify": {
       "enabled": true,
       "renameLocals": false
     },
-    // Optinally generate .map file
     "sourceMap": false
   }
 ]

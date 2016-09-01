@@ -2,8 +2,36 @@ var baseMixin = {
     data: function () {
         return {
             mainHub: $.connection.mainHub,
-            loaded: false
+            loaded: false,
+            alert: $('#alert')
         };
+    },
+    ready: function () {
+        var $this = this;
+
+        // enable SignalR console logging
+        $.connection.hub.logging = true;
+
+        // alert on slow connection
+        $.connection.hub.connectionSlow(function () {
+            $this.showAlert('We are currently experiencing difficulties with the SignalR connection');
+        });
+
+        // alert on connection error
+        $.connection.hub.error(function (error) {
+            $this.showAlert(error);
+        });
+
+        // alert on reconnected
+        $.connection.hub.reconnected(function () {
+            $this.showAlert('Reconnected to SignalR hub, transport ' + $.connection.hub.transport.name);
+        });
+    },
+    methods: {
+        showAlert: function (message) {
+            this.alert.find("p").text(message);
+            this.alert.show();
+        }
     },
     filters: {
         truncate: function (val, len) {
@@ -41,14 +69,14 @@ var host = Vue.extend({
     },
     ready: function () {
         var $this = this;
-        $.connection.hub.logging = true;
+
+        // subscribe to push events
         this.mainHub.client.onContainerEvent = this.onContainerEvent;
+
+        // connect to SignalR hub
         $.connection.hub.start().done(function () {
-            $this.loadHost();
-            $this.loadLists();
+            $this.loadData();
             $this.loaded = true;
-        }).fail(function () {
-            //log error
         });
     },
     methods: {
@@ -73,13 +101,15 @@ var host = Vue.extend({
             var $this = this;
             this.mainHub.server.getImageList().then(function (images) {
                 $this.images = images;
+                $this.host.Images = images.length;
             });
         },
-        loadLists: function () {
+        loadData: function () {
+            this.loadHost();
             this.loadContainers();
             this.loadImages();
             if (this.timer) clearTimeout(this.timer);
-            this.timer = setTimeout(this.loadLists, 30000);
+            this.timer = setTimeout(this.loadData, 30000);
         }
     },
     route: {
@@ -112,7 +142,7 @@ var container = Vue.extend({
     ready: function () {
         this.id = this.$route.params.id;
         var $this = this;
-        $.connection.hub.logging = true;
+
         this.mainHub.client.onContainerEvent = this.onContainerEvent;
         $.connection.hub.start().done(function () {
             $this.loadDetails();

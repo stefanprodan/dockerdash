@@ -64,7 +64,7 @@ namespace DockerDash
         {
             var images = docker.Images.ListImagesAsync(new ImagesListParameters()
             {
-                All = true
+                All = false
             }).Result;
 
             if(images == null || !images.Any())
