@@ -10,7 +10,6 @@
 <script id="host" type="x-template">
     <div class="js-container" v-cloak>
         <div class="row">
-
             <div class="col-lg-5 col-md-5 " v-if="host">
                 <div class="row">
                     <div class="col-lg-12">
@@ -105,8 +104,6 @@
                             </div>
                         </div>
                     </div>
-
-
                 </div>
             </div>
 
@@ -129,34 +126,30 @@
                                     <span class="input-group-addon glyphicon glyphicon-search"></span>
                                 </div>
 
-                                
-                                    <ul class="list-group">
-                                        <li class="list-group-item {{ item.State }}" v-for="item in containers | filterBy filterCon in 'Name' 'Image' 'State'" track-by="Id">
-                                            <a v-link="{ name: 'container', params: { id: item.Id }}">
-                                                <span class="list-item list-item-title">
-                                                    <span class="glyphicon {{ item.State | statusGlyph }}"></span>
-                                                    <span class="name"><strong>{{ item.Name }}</strong></span>
-                                                    <span><small>Id:</small> {{ item.Id | truncate '12' }}</span> &bull;
-                                                    <span><small>Image:</small> {{ item.Image }}</span>
+                                <ul class="list-group">
+                                    <li class="list-group-item {{ item.State }}" v-for="item in containers | filterBy filterCon in 'Name' 'Image' 'State'" track-by="Id">
+                                        <a v-link="{ name: 'container', params: { id: item.Id }}">
+                                            <span class="list-item list-item-title">
+                                                <span class="glyphicon {{ item.State | statusGlyph }}"></span>
+                                                <span class="name"><strong>{{ item.Name }}</strong></span>
+                                                <span><small>Id:</small> {{ item.Id | truncate '12' }}</span> &bull;
+                                                <span><small>Image:</small> {{ item.Image }}</span>
+                                            </span>
+                                            <span class="row list-item list-item-body">
+                                                <span class="col-xs-9 left">
+                                                    <span><small>Command:</small> {{ item.Command }}</span>
+                                                    <span v-if="item.IpAddress"><small>IP:</small> {{ item.IpAddress }}</span>
+                                                    <span v-if="item.Ports"><small>Ports:</small> {{ item.Ports }}</span>
+                                                    <span><small>Status:</small> {{ item.Status }}</span>
                                                 </span>
-                                                <span class="row list-item list-item-body">
-                                                    <span class="col-xs-9 left">
-                                                        <span><small>Command:</small> {{ item.Command }}</span>
-                                                        <span v-if="item.IpAddress"><small>IP:</small> {{ item.IpAddress }}</span>
-                                                        <span v-if="item.Ports"><small>Ports:</small> {{ item.Ports }}</span>
-                                                        <span><small>Status:</small> {{ item.Status }}</span>
-                                                    </span>
-                                                    <span class="col-xs-3 right">
-                                                        <span><small>Created</small> <br />{{ item.Created }}</span>
-                                                        <small class="list-item-link">Details <span class="glyphicon glyphicon-chevron-right"></span></small>
-                                                    </span>
+                                                <span class="col-xs-3 right">
+                                                    <span><small>Created</small> <br />{{ item.Created }}</span>
+                                                    <small class="list-item-link">Details <span class="glyphicon glyphicon-chevron-right"></span></small>
                                                 </span>
-
-                                            </a>
-                                        </li>
-                                    </ul>
-                                
-
+                                            </span>
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
 
                             <div role="tabpanel" class="tab-pane" id="imagesList">
@@ -183,10 +176,9 @@
                                                     <span><small>Created</small> <br />{{ item.Created }}</span>
                                                 </span>
                                             </span>
-
                                         </a>
                                     </li>
-                                </ul>                       
+                                </ul>
                             </div>
 
                             <div role="tabpanel" class="tab-pane" id="netList">
@@ -210,18 +202,14 @@
                                                     <span><small>Containers</small> <br />{{ item.Containers }}</span>
                                                 </span>
                                             </span>
-
                                         </a>
                                     </li>
                                 </ul>
                             </div>
-
-
                         </div>
                     </div>
-
                 </div>
-                </div>
+            </div>
         </div>
     </div>
 </script>
@@ -229,7 +217,6 @@
 <script id="container" type="x-template">
     <div class="js-container" v-cloak>
         <div class="row">
-
             <div class="col-lg-5 col-md-5 ">
                 <div class="row">
                     <div class="col-lg-12">
@@ -246,7 +233,7 @@
                                         <strong>{{ con.State }}</strong> State
                                     </span>
                                     <span>
-                                        <strong>{{ con.Created }}</strong> Created
+                                        <strong>{{ con.Image }}</strong> Image
                                     </span>
                                 </div>
                             </div>
@@ -258,7 +245,7 @@
                             <div class="panel-body">
                                 <div class="two-cols-stats">
                                     <span>
-                                        <strong>{{ con.StartedAt }}</strong> StartedAt
+                                        <strong>{{ con.StartedAt }}</strong> Started at
                                     </span>
                                     <span>
                                         <strong>{{ pids }}</strong> Pids
@@ -295,67 +282,71 @@
                             </div>
                         </div>
                     </div>
-
-
                 </div>
             </div>
-
             <div class="col-lg-7 col-md-7 json-pannels">
                 <div class="page-container">
                     <div role="tabpanel" v-if="con">
-
                         <ul class="nav nav-tabs" role="tablist">
                             <li role="presentation" class="active"><a href="#props" aria-controls="props" role="tab" data-toggle="tab">Props</a></li>
                             <li role="presentation"><a href="#logs" aria-controls="logs" role="tab" data-toggle="tab">Logs</a></li>
                         </ul>
-
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="props">
-
-                                <div class="definition-table row">
-                                    <div class="col-xs-6">
-                                        <dl>
-                                            <dt>{{ con.Image }}</dt>
-                                            <dd><small>Image</small></dd>
-                                        </dl>
-                                        <dl>
-                                            <dt>{{ con.Created }}</dt>
-                                            <dd><small>Created</small></dd>
-                                        </dl>
-                                        <dl>
-                                            <dt>{{ con.Command }}</dt>
-                                            <dd><small>Command</small></dd>
-                                        </dl>
-                                        <dl>
-                                            <dt>{{ con.Driver }}</dt>
-                                            <dd><small>Driver</small></dd>
-                                        </dl>
-                                    </div>
-                                    <div class="col-xs-6">
-                                        <dl>
-                                            <dt>{{ con.IpAddress }}</dt>
-                                            <dd><small>IP</small></dd>
-                                        </dl>
-                                        <dl>
-                                            <dt>{{ con.Ports }}</dt>
-                                            <dd><small>Ports</small></dd>
-                                        </dl>
-                                    </div>
-                                    
-                                    
+                                <div class="about page-container">
+                                    <ul>
+                                        <li>
+                                            <small>Created:</small>
+                                            <span>{{ con.Created }}</span>
+                                        </li>
+                                        <li>
+                                            <small>Command:</small>
+                                            <span>{{ con.Command }}</span>
+                                        </li>
+                                        <li v-for="env in con.Env">
+                                            <small>Env:</small>
+                                            <span class="break">{{ env }}</span>
+                                        </li>
+                                        <li>
+                                            <small>Ports:</small>
+                                            <span>{{ con.Ports }}</span>
+                                        </li>
+                                        <li v-for="net in con.Networks">
+                                            <small>Network:</small>
+                                            <span>{{ net }}</span>
+                                        </li>
+                                        <li v-for="mount in con.Mounts">
+                                            <small>Mount:</small>
+                                            <span class="break">{{ mount }}</span>
+                                        </li>
+                                        <li v-for="entry in con.Entrypoint">
+                                            <small>Entrypoint:</small>
+                                            <span>{{ entry }}</span>
+                                        </li>
+                                        <li v-if="con.WorkingDir">
+                                            <small>WorkingDir:</small>
+                                            <span class="break">{{ con.WorkingDir}}</span>
+                                        </li>
+                                        <li>
+                                            <small>Path:</small>
+                                            <span>{{ con.Path }}</span>
+                                        </li>
+                                        <li>
+                                            <small>Driver:</small>
+                                            <span>{{ con.Driver }}</span>
+                                        </li>
+                                        <li>
+                                            <small>Restarts:</small>
+                                            <span>{{ con.RestartCount }}</span>
+                                        </li>
+                                    </ul>
                                 </div>
-
                             </div>
                             <div role="tabpanel" class="tab-pane" id="logs">
-                               
-                                    
-                                        <pre>{{ logs }}</pre>
-                                    
+                                <pre>{{ logs }}</pre>
                             </div>
-
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

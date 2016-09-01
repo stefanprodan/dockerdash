@@ -18,6 +18,7 @@ namespace DockerDash
         public string State { get; set; }
         public string Created { get; set; }
         public string IpAddress { get; set; }
+        public List<string> Networks { get; set; }
         public string Ports { get; set; }
         public string MemoryUsage { get; set; }
         public string Command { get; set; }
@@ -26,5 +27,10 @@ namespace DockerDash
         public long RestartCount { get; set; }
         public string Driver { get; set; }
         public string StartedAt { get; set; }
+        public string Path { get; set; }
+        public List<string> Mounts { get; set; }
+        public List<string> Env { get; set; }
+        public string WorkingDir { get; set; }
+        public List<string> Entrypoint { get; set; }
     }
 }

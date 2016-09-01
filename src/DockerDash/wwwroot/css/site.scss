@@ -11,7 +11,7 @@ pre {
     white-space: -pre-wrap; 
     white-space: -o-pre-wrap; 
     word-wrap: break-word;
-    max-height: 400px;
+    max-height: 500px;
     border: none;
     border-radius: 0;
 }
@@ -32,6 +32,12 @@ canvas {
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
+}
+
+.break {
+    display: block;
+    word-wrap:break-word;
+    white-space: normal;
 }
 
 .two-cols-stats {

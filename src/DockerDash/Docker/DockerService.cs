@@ -274,15 +274,40 @@ namespace DockerDash
                 Created = inspec.Created.ToString("dd-MM-yy HH:mm"),
                 Driver = inspec.Driver,
                 RestartCount = inspec.RestartCount,
+                Path = inspec.Path,
                 StartedAt = Convert.ToDateTime(inspec.State.StartedAt).ToString("dd-MM-yy HH:mm"),
                 Command = inspec.Args.Aggregate((current, next) => current + " " + next)
             };
+
+            if (inspec.Config != null)
+            {
+                details.WorkingDir = inspec.Config.WorkingDir;
+
+                if (inspec.Config.Entrypoint != null && inspec.Config.Entrypoint.Any())
+                {
+                    details.Entrypoint = inspec.Config.Entrypoint.ToList();
+                }
+
+                if (inspec.Config.Env != null && inspec.Config.Env.Any())
+                {
+                    details.Env = inspec.Config.Env.ToList();
+                }
+            }
+
+
+            if (inspec.Mounts != null && inspec.Mounts.Any())
+            {
+                details.Mounts = new List<string>();
+                foreach (var m in inspec.Mounts)
+                {
+                    details.Mounts.Add($"Source: {m.Source} Destination: {m.Destination}");
+                }
+            }
 
             if (inspec.State.Running)
             {
                 if (inspec.NetworkSettings != null && inspec.NetworkSettings.Networks != null && inspec.NetworkSettings.Networks.Any())
                 {
-                    details.IpAddress = inspec.NetworkSettings.Networks.Select(n => n.Value.IPAddress).Aggregate((current, next) => current + ", " + next);
                     var portData = string.Empty;
 
                     if (inspec.NetworkSettings.Ports != null)
@@ -301,6 +326,12 @@ namespace DockerDash
                         }
                     }
                     details.Ports = portData;
+
+                    details.Networks = new List<string>();
+                    foreach (var net in inspec.NetworkSettings.Networks)
+                    {
+                        details.Networks.Add($"{net.Key} IP: {net.Value.IPAddress} Gateway: {net.Value.Gateway} Mac: {net.Value.MacAddress}");
+                    }
                 }
             }
 
@@ -355,7 +386,7 @@ namespace DockerDash
                     };
 
                     return net;
-                }).ToList();
+                }).OrderBy( n => n.Name).ToList();
             }
             catch (Exception ex)
             {
