@@ -45,5 +45,10 @@ namespace DockerDash
         {
             return _dockerService.GetImageList();
         }
+
+        public List<NetworkModel> GetNetworkList()
+        {
+            return _dockerService.GetNetworkList();
+        }
     }
 }

@@ -20,6 +20,7 @@ docker run -d -p 5050:5050 -v /var/run/docker.sock:/var/run/docker.sock --name d
 * Containers real-time status via web sockets
 * Container details, resource usage and logs
 * Images information
+* Networks information
 
 ### Todo
 

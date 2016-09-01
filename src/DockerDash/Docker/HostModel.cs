@@ -30,5 +30,6 @@ namespace DockerDash
         public string SwarmMode { get; set; }
         public long SwarmManagers { get; set; }
         public long SwarmNodes { get; set; }
+        public long Networks { get; set; }
     }
 }

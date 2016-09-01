@@ -116,8 +116,9 @@
                     <div role="tabpanel" v-if="containers">
 
                         <ul class="nav nav-tabs" role="tablist">
-                            <li role="presentation" class="active"><a href="#containerList" aria-controls="containerList" role="tab" data-toggle="tab">{{ host.Containers }} Containers</a></li>
-                            <li role="presentation"><a href="#imagesList" aria-controls="imagesList" role="tab" data-toggle="tab">{{ host.Images }} Images</a></li>
+                            <li role="presentation" class="active"><a href="#containerList" aria-controls="containerList" role="tab" data-toggle="tab">{{ countCon }} Containers</a></li>
+                            <li role="presentation"><a href="#imagesList" aria-controls="imagesList" role="tab" data-toggle="tab">{{ countImg }} Images</a></li>
+                            <li role="presentation"><a href="#netList" aria-controls="netList" role="tab" data-toggle="tab">{{ countNet }} Networks</a></li>
                         </ul>
 
                         <div class="tab-content">
@@ -159,14 +160,10 @@
                             </div>
 
                             <div role="tabpanel" class="tab-pane" id="imagesList">
-                                
-                                    
                                 <div class="input-group search">
                                     <input type="text" class="form-control" placeholder="Search images" v-model="filterImg">
                                     <span class="input-group-addon glyphicon glyphicon-search"></span>
                                 </div>
-
-
                                 <ul class="list-group" v-if="images">
                                     <li class="list-group-item running" v-for="item in images | filterBy filterImg in 'RepoTags' 'Labels'" track-by="Id">
                                         <a>
@@ -189,11 +186,35 @@
 
                                         </a>
                                     </li>
-                                </ul>
-                                    
-                                
+                                </ul>                       
                             </div>
 
+                            <div role="tabpanel" class="tab-pane" id="netList">
+                                <div class="input-group search">
+                                    <input type="text" class="form-control" placeholder="Search networks" v-model="filterNet">
+                                    <span class="input-group-addon glyphicon glyphicon-search"></span>
+                                </div>
+                                <ul class="list-group" v-if="networks">
+                                    <li class="list-group-item running" v-for="item in networks | filterBy filterNet in 'Name' 'Driver' 'Scope'" track-by="Id">
+                                        <a>
+                                            <span class="list-item list-item-title">
+                                                <span class="glyphicon glyphicon-signal"></span>
+                                                <span class="name"><strong>{{ item.Name }}</strong></span>
+                                            </span>
+                                            <span class="row list-item list-item-body">
+                                                <span class="col-xs-9 left">
+                                                    <span><small>Scope:</small> {{ item.Scope }}</span>
+                                                    <span><small>Driver:</small> {{ item.Driver }}</span>
+                                                </span>
+                                                <span class="col-xs-3 right">
+                                                    <span><small>Containers</small> <br />{{ item.Containers }}</span>
+                                                </span>
+                                            </span>
+
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
 
 
                         </div>

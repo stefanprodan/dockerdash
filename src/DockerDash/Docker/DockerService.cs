@@ -1,6 +1,7 @@
 ﻿using Docker.DotNet;
 using Docker.DotNet.Models;
 using Microsoft.AspNetCore.SignalR.Infrastructure;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -18,10 +19,12 @@ namespace DockerDash
         private Task monitorContainersTask;
         private DockerClient docker;
         private readonly IConnectionManager _signalManager;
+        private readonly ILogger<DockerService> _logger;
 
         public string Host { get; set; }
-        public DockerService(IOptions<DockerHost> options, IConnectionManager signalManager)
+        public DockerService(IOptions<DockerHost> options, IConnectionManager signalManager, ILogger<DockerService> logger)
         {
+            _logger = logger;
             Host = options.Value.Uri;
             _signalManager = signalManager;
             docker = new DockerClientConfiguration(new Uri(Host)).CreateClient();
@@ -333,6 +336,33 @@ namespace DockerDash
                 SwarmManagers = info.Swarm.Managers,
                 SwarmNodes = info.Swarm.Nodes
             };
+        }
+
+        public List<NetworkModel> GetNetworkList()
+        {
+            try
+            {
+                var networks = docker.Networks.ListNetworksAsync().Result;
+                return networks.Select(n =>
+                {
+                    var net = new NetworkModel
+                    {
+                        Id = n.ID,
+                        Containers = (n.Containers != null && n.Containers.Any()) ? n.Containers.Count() : 0,
+                        Driver = n.Driver,
+                        Name = n.Name,
+                        Scope = n.Scope
+                    };
+
+                    return net;
+                }).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(1001, ex, ex.Message);
+                throw;
+            }
+
         }
     }
 }

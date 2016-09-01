@@ -7,9 +7,14 @@
             timer: null,
             filterCon: '',
             filterImg: '',
+            filterNet: '',
+            countCon: 0,
+            countImg: 0,
+            countNet: 0,
             host : null,
             containers: null,
-            images: null
+            images: null,
+            networks: null,
         }
     },
     ready: function () {
@@ -35,6 +40,7 @@
             var $this = this;
             this.mainHub.server.getContainerList().then(function (containers) {
                 $this.containers = containers;
+                $this.countCon = containers.length;
             });
         },
         onContainerEvent: function (event) {
@@ -46,13 +52,21 @@
             var $this = this;
             this.mainHub.server.getImageList().then(function (images) {
                 $this.images = images;
-                $this.host.Images = images.length;
+                $this.countImg = images.length;
+            });
+        },
+        loadNetworks: function () {
+            var $this = this;
+            this.mainHub.server.getNetworkList().then(function (networks) {
+                $this.networks = networks;
+                $this.countNet = networks.length;
             });
         },
         loadData: function () {
             this.loadHost();
             this.loadContainers();
             this.loadImages();
+            this.loadNetworks();
             if (this.timer) clearTimeout(this.timer);
             this.timer = setTimeout(this.loadData, 30000);
         }
