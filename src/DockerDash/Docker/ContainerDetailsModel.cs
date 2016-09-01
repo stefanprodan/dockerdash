@@ -25,5 +25,6 @@ namespace DockerDash
         public string SizeRootFs { get; set; }
         public long RestartCount { get; set; }
         public string Driver { get; set; }
+        public string StartedAt { get; set; }
     }
 }

@@ -225,6 +225,39 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="panel panel-default" v-if="mem">
+                            <div class="panel-heading master">
+                                <h3 class="panel-title"><span class="glyphicon glyphicon-signal"></span> Stats</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="two-cols-stats">
+                                    <span>
+                                        <strong>{{ con.StartedAt }}</strong> StartedAt
+                                    </span>
+                                    <span>
+                                        <strong>{{ pids }}</strong> Pids
+                                    </span>
+                                    <span>
+                                        <strong>{{ mem }}</strong> Memory
+                                    </span>
+                                    <span>
+                                        <strong>{{ rxTotal }}</strong> Network in total
+                                    </span>
+                                    <span>
+                                        <strong>{{ txTotal }}</strong> Network out total
+                                    </span>
+                                    <span>
+                                        <strong>{{ cpuTime }}</strong> CPU total time
+                                    </span>
+                                    <span>
+                                        <strong>{{ iorxTotal }}</strong> IO read total
+                                    </span>
+                                    <span>
+                                        <strong>{{ iotxTotal }}</strong> IO write total
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                         <div class="panel panel-default">
                             <div class="panel-heading master">
                                 <h3 class="panel-title"><span class="glyphicon glyphicon-signal"></span> Memory {{ mem }}</h3>
@@ -258,6 +291,10 @@
                                         <dl>
                                             <dt>{{ con.Image }}</dt>
                                             <dd><small>Image</small></dd>
+                                        </dl>
+                                        <dl>
+                                            <dt>{{ con.Created }}</dt>
+                                            <dd><small>Created</small></dd>
                                         </dl>
                                         <dl>
                                             <dt>{{ con.Command }}</dt>

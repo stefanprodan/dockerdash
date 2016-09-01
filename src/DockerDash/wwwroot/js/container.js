@@ -7,6 +7,12 @@
             logs: '',
             memChart: null,
             mem: '',
+            rxTotal: '',
+            txTotal: '',
+            iorxTotal: '',
+            iotxTotal: '',
+            cpuTime: '',
+            pids: 0,
             timer: null,
             con: null
         }
@@ -44,17 +50,29 @@
         getMemoryStats: function(){
             var $this = this;
             this.mainHub.server.getMemoryStats(this.id).then(function (data) {
-                // Add new data
-                $this.memChart.data.labels.push(data.label); // add new label at end
-                $this.memChart.data.datasets[0].data.push(data.value);
-
+                // add new memory data
+                $this.memChart.data.labels.push(data.memory.label);
+                $this.memChart.data.datasets[0].data.push(data.memory.value);
                 $this.memChart.update();
-                $this.mem = data.label;
-                if ($this.memChart.data.datasets[0].data.length == 6) {
+
+                // update memory current
+                $this.mem = data.memory.label;
+
+                // remove oldest memory point 
+                if ($this.memChart.data.datasets[0].data.length == 7) {
                     $this.memChart.data.labels.splice(0, 1);
                     $this.memChart.data.datasets[0].data.splice(0, 1);
                     $this.memChart.update();
                 };
+
+                $this.rxTotal = data.network.labelrx;
+                $this.txTotal = data.network.labeltx;
+                $this.iorxTotal = data.io.labelrx;
+                $this.iotxTotal = data.io.labeltx;
+                $this.pids = data.pids;
+                $this.cpuTime = data.cpuTime;
+
+                // enqueue new call after 10 seconds
                 if ($this.timer) clearTimeout($this.timer);
                 $this.timer = setTimeout($this.getMemoryStats, 10000);
             });

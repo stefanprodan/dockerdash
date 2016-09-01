@@ -118,17 +118,58 @@ namespace DockerDash
             if (inspec.State.Running)
             {
                 var stats = GetContainerStats(id);
+                var rxTotal = Convert.ToUInt64(stats.Networks.Values.Sum(n => Convert.ToDecimal(n.RxBytes)));
+                var txTotal = Convert.ToUInt64(stats.Networks.Values.Sum(n => Convert.ToDecimal(n.TxBytes)));
+
+                ulong ioReadTotal = 0;
+                ulong ioWriteTotal = 0;
+
+                if(stats.BlkioStats.IoServiceBytesRecursive.Any())
+                {
+                    ioReadTotal = stats.BlkioStats.IoServiceBytesRecursive[0].Value;
+                    ioWriteTotal = stats.BlkioStats.IoServiceBytesRecursive[1].Value;
+                }
+
                 return new
                 {
-                    value = ConvertBytesToKilo(stats.MemoryStats.Usage),
-                    label = FormatBytes(stats.MemoryStats.Usage)
+                    memory = new
+                    {
+                        value = ConvertBytesToKilo(stats.MemoryStats.Usage),
+                        label = FormatBytes(stats.MemoryStats.Usage)
+                    },
+                    network = new
+                    {
+                        valuerx = ConvertBytesToKilo(rxTotal),
+                        labelrx = FormatBytes(rxTotal),
+                        valuetx = ConvertBytesToKilo(txTotal),
+                        labeltx = FormatBytes(txTotal)
+                    },
+                    io = new
+                    {
+                        valuerx = ConvertBytesToKilo(ioReadTotal),
+                        labelrx = FormatBytes(ioReadTotal),
+                        valuetx = ConvertBytesToKilo(ioWriteTotal),
+                        labeltx = FormatBytes(ioWriteTotal)
+                    },
+                    pids = stats.PidsStats.Current,
+                    cpuTime = TimeSpan.FromTicks(Convert.ToInt64(stats.CPUStats.CPUUsage.TotalUsage/100)).ToString("c")
                 };
             }
 
             return new
             {
-                value = 0,
-                label = "0 MiB"
+                memory = new
+                {
+                    value = 0,
+                    label = "0 MB"
+                },
+                network = new
+                {
+                    valuerx = 0,
+                    labelrx = "0 KB",
+                    valuetx = 0,
+                    labeltx = "0 KB"
+                }
             };
         }
 
@@ -230,6 +271,7 @@ namespace DockerDash
                 Created = inspec.Created.ToString("dd-MM-yy HH:mm"),
                 Driver = inspec.Driver,
                 RestartCount = inspec.RestartCount,
+                StartedAt = Convert.ToDateTime(inspec.State.StartedAt).ToString("dd-MM-yy HH:mm"),
                 Command = inspec.Args.Aggregate((current, next) => current + " " + next)
             };
 
