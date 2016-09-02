@@ -9,6 +9,10 @@ ENV DOCKER_REMOTE_API="unix:///var/run/docker.sock"
 ENV ASPNETCORE_URLS="http://*:5050"
 ENV ASPNETCORE_ENVIRONMENT="Staging"
 
+# Set user/pass
+ENV DOCKERDASH_USER="admin"
+ENV DOCKERDASH_PASSWORD="changeme"
+
 # Copy files to app directory
 COPY /src/Docker.DotNet /app/src/Docker.DotNet
 COPY /src/DockerDash /app/src/DockerDash

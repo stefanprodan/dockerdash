@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-alpha2",
   "description": "Docker dashboard built with ASP.NET Core, Docker.DotNet, SignalR and Vuejs",
   "authors": [ "Stefan Prodan" ],
@@ -36,7 +36,10 @@
     "Microsoft.VisualStudio.Web.BrowserLink.Loader": "14.0.0",
     "Microsoft.AspNetCore.WebSockets.Server": "0.1.0",
     "Microsoft.AspNetCore.SignalR.Server": "0.1.0-rtm-21431",
-    "Docker.DotNet": "2.124.2"
+    "Docker.DotNet": "2.124.2",
+    "System.IdentityModel.Tokens.Jwt": "5.0.0",
+    "Microsoft.IdentityModel.Tokens": "5.0.0",
+    "Microsoft.AspNetCore.Authentication.JwtBearer": "1.0.0"
   },
 
   "tools": {

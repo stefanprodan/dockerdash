@@ -10,9 +10,12 @@ using Microsoft.Extensions.Logging;
 
 namespace DockerDash
 {
-    public class Startup
+    public partial class Startup
     {
         private IHostingEnvironment _env;
+        private string jwtKey;
+        private string user;
+        private string password;
 
         public Startup(IHostingEnvironment env)
         {
@@ -24,6 +27,8 @@ namespace DockerDash
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+
+            jwtKey = Configuration["JWTKey"];
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -41,6 +46,9 @@ namespace DockerDash
 
             if (_env.IsDevelopment())
             {
+                user = Configuration["User"];
+                password = Configuration["Password"];
+
                 services.Configure<DockerHost>(Configuration.GetSection("DockerHostDev"));
             }
             else
@@ -54,6 +62,18 @@ namespace DockerDash
                 services.Configure<DockerHost>(dockerHost => {
                     dockerHost.Uri = dockerAddress;
                 });
+
+                user = Environment.GetEnvironmentVariable("DOCKERDASH_USER");
+                if (string.IsNullOrEmpty(user))
+                {
+                    throw new Exception("DOCKERDASH_USER environment variable not found");
+                }
+
+                password = Environment.GetEnvironmentVariable("DOCKERDASH_PASSWORD");
+                if (string.IsNullOrEmpty(password))
+                {
+                    throw new Exception("DOCKERDASH_PASSWORD environment variable not found");
+                }
             }
 
             services.AddSingleton<DockerService>();
@@ -78,6 +98,8 @@ namespace DockerDash
             app.UseStaticFiles();
             app.UseWebSockets();
             app.UseSignalR();
+
+            ConfigureAuth(app);
 
             app.UseMvc(routes =>
             {
