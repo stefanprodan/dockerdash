@@ -25,8 +25,8 @@
     "outputFileName": "wwwroot/app/app.js",
     "inputFiles": [
       "wwwroot/js/auth.js",
-      "wwwroot/js/login.js",
       "wwwroot/js/base.js",
+      "wwwroot/js/login.js",
       "wwwroot/js/host.js",
       "wwwroot/js/container.js",
       "wwwroot/js/main.js"
@@ -40,13 +40,15 @@
   {
     "outputFileName": "wwwroot/app/app.min.js",
     "inputFiles": [
+      "wwwroot/js/auth.js",
       "wwwroot/js/base.js",
+      "wwwroot/js/login.js",
       "wwwroot/js/host.js",
       "wwwroot/js/container.js",
       "wwwroot/js/main.js"
     ],
     "minify": {
-      "enabled": true,
+      "enabled": false,
       "renameLocals": false
     },
     "sourceMap": false
