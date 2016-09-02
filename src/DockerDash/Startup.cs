@@ -95,6 +95,26 @@ namespace DockerDash
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            // SignalR hack: get token from QueryString and create Authorization header
+            app.Use(async (context, next) =>
+            {
+                if (string.IsNullOrWhiteSpace(context.Request.Headers["Authorization"]))
+                {
+                    if (context.Request.QueryString.HasValue)
+                    {
+                        var token = context.Request.QueryString.Value
+                            .Split('&')
+                            .SingleOrDefault(x => x.Contains("authorization"))?.Split('=')[1];
+
+                        if (!string.IsNullOrWhiteSpace(token))
+                        {
+                            context.Request.Headers.Add("Authorization", new[] { $"Bearer {token}" });
+                        }
+                    }
+                }
+                await next.Invoke();
+            });
+
             app.UseStaticFiles();
             app.UseWebSockets();
             app.UseSignalR();

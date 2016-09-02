@@ -1,11 +1,12 @@
 ﻿/// <autosync enabled="true" />
 /// <reference path="app/app.js" />
 /// <reference path="app/lib.js" />
+/// <reference path="js/auth.js" />
 /// <reference path="js/base.js" />
 /// <reference path="js/container.js" />
-/// <reference path="js/jquery.signalr-2.2.1.min.js" />
-/// <reference path="js/site - copy.js" />
-/// <reference path="js/site.js" />
+/// <reference path="js/host.js" />
+/// <reference path="js/login.js" />
+/// <reference path="js/main.js" />
 /// <reference path="lib/bootstrap/dist/js/bootstrap.js" />
 /// <reference path="lib/jquery/dist/jquery.js" />
 /// <reference path="lib/jquery-validation/dist/jquery.validate.js" />

@@ -17,15 +17,22 @@ router.map({
         name: 'home',
         title: 'Home'
     },
+    '/login': {
+        component: login,
+        name: 'login',
+        title: 'Login'
+    },
     '/host': {
         component: host,
         name: 'host',
-        title: 'Host'
+        title: 'Host',
+        auth: true
     },
     '/container/:id': {
         component: container,
         name: 'container',
-        title: 'Container details'
+        title: 'Container details',
+        auth: true
     },
     '/about': {
         component: {
@@ -34,8 +41,44 @@ router.map({
         name: 'about',
         title: 'About'
     }
-})
+});
 
-var app = Vue.extend({});
+router.beforeEach(function (transition) {
+    if (transition.to.auth && !auth.checkAuth()) {
+        transition.redirect('/login')
+    } else {
+        transition.next()
+    }
+});
+
+var app = Vue.extend({
+    data: function () {
+        return {
+            authenticated: false
+        };
+    },
+    ready: function () {
+        this.authenticated = auth.checkAuth();
+
+        if (this.authenticated) {
+            Vue.http.headers.common['Authorization'] = 'Bearer ' + auth.getAccessToken();
+        }
+    },
+    methods: {
+        logout: function () {
+            auth.logout();
+            this.authenticated = false;
+            this.$route.router.go('/login');
+        }
+    },
+    events: {
+        'on-login': function () {
+            this.authenticated = true;
+        },
+        'do-logout': function () {
+            this.logout();
+        }
+    }
+});
 
 router.start(app, 'html');

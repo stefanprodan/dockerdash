@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DockerDash
 {
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public class MainHub: Hub
     {
         private readonly DockerService _dockerService;

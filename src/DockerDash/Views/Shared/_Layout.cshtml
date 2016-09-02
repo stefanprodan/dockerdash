@@ -34,8 +34,13 @@
                     <ul class="nav navbar-nav">
                         <li v-link-active><a v-link="{name: 'host'}">Host</a></li>
                         <li v-link-active><a v-link="{name: 'about'}">About</a></li>
+
+                    </ul>
+                    <ul class="nav navbar-nav pull-right" v-if="authenticated" v-cloak>
+                        <li><a href="#" v-on:click="logout()">Logout</a></li>
                     </ul>
                 </div>
+
             </div>
         </div>
         <div class="container body-content">

@@ -12,8 +12,8 @@
       "wwwroot/lib/bootstrap/dist/js/bootstrap.min.js",
       "wwwroot/lib/vue/dist/vue.min.js",
       "wwwroot/lib/vue-router/dist/vue-router.min.js",
-      "wwwroot/lib/signalr/jquery.signalr-2.2.1.min.js",
-      "wwwroot/lib/chartjs/Chart.min.js"
+      "wwwroot/lib/vue-resource/vue-resource.min.js",
+      "wwwroot/lib/signalr/jquery.signalr-2.2.1.min.js"
     ],
     "minify": {
       "enabled": false,
@@ -24,6 +24,8 @@
   {
     "outputFileName": "wwwroot/app/app.js",
     "inputFiles": [
+      "wwwroot/js/auth.js",
+      "wwwroot/js/login.js",
       "wwwroot/js/base.js",
       "wwwroot/js/host.js",
       "wwwroot/js/container.js",

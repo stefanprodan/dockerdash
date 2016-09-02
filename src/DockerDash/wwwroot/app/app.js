@@ -1,3 +1,79 @@
+var auth = {
+    user: {
+        authenticated: false
+    }
+    ,
+    login(context, creds, redirect) {
+        $this = this;
+        // use application/x-www-form-urlencoded
+        Vue.http.options.emulateJSON = true;
+        context.$http.post(window.location.origin + '/token', creds).then((response) => {
+
+            var access_token = response.json().access_token;
+            localStorage.setItem('access_token', access_token);
+            $this.user.authenticated = true;
+
+            context.$dispatch('on-login');
+
+            Vue.http.headers.common['Authorization'] = 'Bearer ' + $this.getAccessToken();
+
+            if (redirect) {
+                router.go(redirect)
+            }
+
+        }, (response) => {
+            context.error = response.body;
+        });
+    },
+    checkAuth() {
+        if (localStorage.getItem('access_token')) {
+            this.user.authenticated = true;
+        }
+        else {
+            this.user.authenticated = false;
+        }
+
+        return this.user.authenticated;
+    },
+    getAccessToken() {
+        return localStorage.getItem('access_token')
+    },
+    logout() {
+        localStorage.removeItem('access_token')
+        this.user.authenticated = false
+    }
+};
+
+var login = Vue.extend({
+    template: '#login',
+    data: function () {
+        return {
+            credentials: {
+                username: '',
+                password: ''
+            },
+            error: ''
+        }
+    },
+    ready: function () {
+        var $this = this;
+    },
+    methods: {
+        submit() {
+            var credentials = {
+                username: this.credentials.username,
+                password: this.credentials.password
+            }
+            auth.login(this, credentials, 'host')
+        }
+    },
+    route: {
+        deactivate: function () {
+
+        }
+    }
+});
+
 var baseMixin = {
     data: function () {
         return {
@@ -9,6 +85,8 @@ var baseMixin = {
     ready: function () {
         var $this = this;
 
+        $.connection.hub.qs = { 'authorization': auth.getAccessToken() };
+
         // enable SignalR console logging
         $.connection.hub.logging = true;
 
@@ -19,7 +97,14 @@ var baseMixin = {
 
         // alert on connection error
         $.connection.hub.error(function (error) {
-            $this.showAlert(error);
+            if (error.context && error.context.status == 401)
+            {
+                $this.showAlert('Session expired, please login.');
+                $this.$dispatch('do-logout');
+            } else {
+                $this.showAlert(error);
+            }
+
         });
 
         // alert on reconnected
@@ -31,6 +116,9 @@ var baseMixin = {
         showAlert: function (message) {
             this.alert.find("p").text(message);
             this.alert.show();
+        },
+        isAuthenticated: function () {
+            auth.checkAuth();
         }
     },
     filters: {
@@ -305,15 +393,22 @@ router.map({
         name: 'home',
         title: 'Home'
     },
+    '/login': {
+        component: login,
+        name: 'login',
+        title: 'Login'
+    },
     '/host': {
         component: host,
         name: 'host',
-        title: 'Host'
+        title: 'Host',
+        auth: true
     },
     '/container/:id': {
         component: container,
         name: 'container',
-        title: 'Container details'
+        title: 'Container details',
+        auth: true
     },
     '/about': {
         component: {
@@ -322,8 +417,44 @@ router.map({
         name: 'about',
         title: 'About'
     }
-})
+});
 
-var app = Vue.extend({});
+router.beforeEach(function (transition) {
+    if (transition.to.auth && !auth.checkAuth()) {
+        transition.redirect('/login')
+    } else {
+        transition.next()
+    }
+});
+
+var app = Vue.extend({
+    data: function () {
+        return {
+            authenticated: false
+        };
+    },
+    ready: function () {
+        this.authenticated = auth.checkAuth();
+
+        if (this.authenticated) {
+            Vue.http.headers.common['Authorization'] = 'Bearer ' + auth.getAccessToken();
+        }
+    },
+    methods: {
+        logout: function () {
+            auth.logout();
+            this.authenticated = false;
+            this.$route.router.go('/login');
+        }
+    },
+    events: {
+        'on-login': function () {
+            this.authenticated = true;
+        },
+        'do-logout': function () {
+            this.logout();
+        }
+    }
+});
 
 router.start(app, 'html');
