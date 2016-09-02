@@ -5,14 +5,30 @@
 
 Docker dashboard built with ASP.NET Core, Docker.DotNet, SignalR and Vuejs.
 
-Compatible with Docker v1.12, requires docker socket to be mounted as a volume.
+Compatible with Docker v1.12.
 
 ### Run
 
+Connect to docker remote API using unix socket `unix:///var/run/docker.sock`:
+
 ```
 docker pull stefanprodan/dockerdash:latest
-docker run -d -p 5050:5050 -v /var/run/docker.sock:/var/run/docker.sock --name dockerdash stefanprodan/dockerdash
+
+docker run -d -p 5050:5050 \
+-v /var/run/docker.sock:/var/run/docker.sock \
+--name dockerdash \
+stefanprodan/dockerdash
 ```
+
+Connect to a docker remote API via TCP:
+
+```
+docker run -d -p 5050:5050 \
+-e DOCKER_REMOTE_API='tcp://192.168.1.134:4243' \
+--name dockerdash \
+stefanprodan/dockerdash
+```
+
 
 ### Features
 

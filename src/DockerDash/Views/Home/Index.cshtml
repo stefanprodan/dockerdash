@@ -1,8 +1,4 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div id="alert" class="alert alert-info alert-dismissible" role="alert" style="display:none;">
+﻿<div id="alert" class="alert alert-info alert-dismissible" role="alert" style="display:none;">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
     <p></p>
 </div>
@@ -222,7 +218,7 @@
                     <div class="col-lg-12">
                         <div class="panel panel-default" v-if="con">
                             <div class="panel-heading master">
-                                <h3 class="panel-title"><span class="glyphicon glyphicon-king"></span> {{ con.Name }}</h3>
+                                <h3 class="panel-title"><span class="glyphicon glyphicon-star"></span> {{ con.Name }}</h3>
                             </div>
                             <div class="panel-body">
                                 <div class="two-cols-stats">
@@ -233,7 +229,7 @@
                                         <strong>{{ con.State }}</strong> State
                                     </span>
                                     <span>
-                                        <strong>{{ con.Image }}</strong> Image
+                                        <strong>{{ con.Created }}</strong> Created at
                                     </span>
                                 </div>
                             </div>
@@ -295,13 +291,13 @@
                             <div role="tabpanel" class="tab-pane active" id="props">
                                 <div class="about page-container">
                                     <ul>
-                                        <li>
-                                            <small>Created at:</small>
-                                            <span>{{ con.Created }}</span>
-                                        </li>
                                         <li v-if="con.FinishedAt">
                                             <small>Finished at:</small>
                                             <span>{{ con.FinishedAt }}</span>
+                                        </li>
+                                        <li>
+                                            <small>Image:</small>
+                                            <span>{{ con.Image }}</span>
                                         </li>
                                         <li v-if="con.Command">
                                             <small>Command:</small>
@@ -369,12 +365,24 @@
                 <span>@Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion</span>
             </li>
             <li>
-                <small>Git:</small>
-                <span><a href="https://github.com/stefanprodan/dockerdash">Repo</a></span>
-            </li>
-            <li>
                 <small>Copyright:</small>
                 <span><a href="https://stefanprodan.com">Stefan Prodan</a></span>
+            </li>
+            <li>
+                <small>Code:</small>
+                <span><a href="https://github.com/stefanprodan/dockerdash">GitHub Repository</a></span>
+            </li>
+            <li>
+                <small>Support:</small>
+                <span><a href="https://github.com/stefanprodan/dockerdash/issues">Issue tracker</a></span>
+            </li>
+            <li>
+                <small>License:</small>
+                <span><a href="https://github.com/stefanprodan/dockerdash/blob/master/LICENSE">MIT License</a></span>
+            </li>
+            <li>
+                <small>Logo:</small>
+                <span>Icon made by <a href="http://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></span>
             </li>
         </ul>
     </div>

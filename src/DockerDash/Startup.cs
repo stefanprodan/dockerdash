@@ -45,7 +45,15 @@ namespace DockerDash
             }
             else
             {
-                services.Configure<DockerHost>(Configuration.GetSection("DockerHost"));
+                var dockerAddress = Environment.GetEnvironmentVariable("DOCKER_REMOTE_API");
+                if(string.IsNullOrEmpty(dockerAddress))
+                {
+                    throw new Exception("DOCKER_REMOTE_API environment variable not found");
+                }
+
+                services.Configure<DockerHost>(dockerHost => {
+                    dockerHost.Uri = dockerAddress;
+                });
             }
 
             services.AddSingleton<DockerService>();

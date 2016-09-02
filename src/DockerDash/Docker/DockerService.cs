@@ -276,7 +276,6 @@ namespace DockerDash
                 RestartCount = inspec.RestartCount,
                 Path = inspec.Path,
                 StartedAt = string.IsNullOrEmpty(inspec.State.StartedAt) ? null : Convert.ToDateTime(inspec.State.StartedAt).ToString("dd-MM-yy HH:mm"),
-                FinishedAt = string.IsNullOrEmpty(inspec.State.FinishedAt) ? null : Convert.ToDateTime(inspec.State.FinishedAt).ToString("dd-MM-yy HH:mm"),
                 Command = inspec.Args.Aggregate((current, next) => current + " " + next)
             };
 
@@ -334,6 +333,10 @@ namespace DockerDash
                         details.Networks.Add($"{net.Key} IP: {net.Value.IPAddress} Gateway: {net.Value.Gateway} Mac: {net.Value.MacAddress}");
                     }
                 }
+            }
+            else
+            {
+                details.FinishedAt = string.IsNullOrEmpty(inspec.State.FinishedAt) ? null : Convert.ToDateTime(inspec.State.FinishedAt).ToString("dd-MM-yy HH:mm");
             }
 
             return details;
