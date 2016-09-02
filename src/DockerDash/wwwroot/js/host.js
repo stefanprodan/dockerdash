@@ -63,10 +63,17 @@
             });
         },
         loadData: function () {
-            this.loadHost();
-            this.loadContainers();
-            this.loadImages();
-            this.loadNetworks();
+            var $this = this;
+            this.mainHub.server.getHost().then(function (data) {
+                $this.host = data.host;
+                $this.containers = data.containers;
+                $this.countCon = data.containers.length;
+                $this.images = data.images;
+                $this.countImg = data.images.length;
+                $this.networks = data.networks;
+                $this.countNet = data.networks.length;
+            });
+
             if (this.timer) clearTimeout(this.timer);
             this.timer = setTimeout(this.loadData, 30000);
         }

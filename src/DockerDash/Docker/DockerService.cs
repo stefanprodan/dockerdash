@@ -30,6 +30,37 @@ namespace DockerDash
             docker = new DockerClientConfiguration(new Uri(Host)).CreateClient();
         }
 
+        public HostModel GetHostInfo()
+        {
+            var info = docker.Miscellaneous.GetSystemInfoAsync().Result;
+            return new HostModel
+            {
+                Architecture = info.Architecture,
+                Containers = info.Containers,
+                ContainersPaused = info.ContainersPaused,
+                ContainersRunning = info.ContainersRunning,
+                ContainersStopped = info.ContainersStopped,
+                DefaultRuntime = info.DefaultRuntime,
+                Driver = info.Driver,
+                Id = info.ID,
+                Images = info.Images,
+                KernelVersion = info.KernelVersion,
+                LoggingDriver = info.LoggingDriver,
+                MemTotal = FormatBytes((ulong)info.MemTotal),
+                NCPU = info.NCPU,
+                Name = info.Name,
+                OperatingSystem = info.OperatingSystem,
+                OSType = info.OSType,
+                ServerVersion = info.ServerVersion,
+                ExecutionDriver = info.ExecutionDriver,
+                CgroupDriver = info.CgroupDriver,
+                NGoroutines = info.NGoroutines,
+                SwarmMode = info.Swarm.LocalNodeState,
+                SwarmManagers = info.Swarm.Managers,
+                SwarmNodes = info.Swarm.Nodes
+            };
+        }
+
         public List<ContainerModel> GetContainerList()
         {
             var containers = docker.Containers.ListContainersAsync(new ContainersListParameters()
@@ -42,7 +73,7 @@ namespace DockerDash
                 var cont = new ContainerModel
                 {
                     Id = c.ID,
-                    Name = c.Names.First().StartsWith("/") ? c.Names.First().Remove(0,1) : c.Names.First(),
+                    Name = c.Names.First().StartsWith("/") ? c.Names.First().Remove(0, 1) : c.Names.First(),
                     Image = c.Image,
                     State = c.State,
                     Status = c.Status,
@@ -50,7 +81,7 @@ namespace DockerDash
                     Created = c.Created.ToString("dd-MM-yy HH:mm")
                 };
 
-                if(cont.State.ToLowerInvariant() == "running")
+                if (cont.State.ToLowerInvariant() == "running")
                 {
                     //var stats = GetContainerStats(c.ID);
                     //cont.MemoryUsage = FormatBytes(stats.MemoryStats.Usage);
@@ -61,6 +92,33 @@ namespace DockerDash
                 return cont;
 
             }).ToList();
+        }
+
+        public List<NetworkModel> GetNetworkList()
+        {
+            try
+            {
+                var networks = docker.Networks.ListNetworksAsync().Result;
+                return networks.Select(n =>
+                {
+                    var net = new NetworkModel
+                    {
+                        Id = n.ID,
+                        Containers = (n.Containers != null && n.Containers.Any()) ? n.Containers.Count() : 0,
+                        Driver = n.Driver,
+                        Name = n.Name,
+                        Scope = n.Scope
+                    };
+
+                    return net;
+                }).OrderBy(n => n.Name).ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(1001, ex, ex.Message);
+                throw;
+            }
+
         }
 
         public List<ImageModel> GetImageList()
@@ -115,12 +173,12 @@ namespace DockerDash
             }).ToList();
         }
 
-        public dynamic GetMemoryStats(string id)
+        public dynamic GetContainerStats(string id)
         {
             var inspec = docker.Containers.InspectContainerAsync(id).Result;
             if (inspec.State.Running)
             {
-                var stats = GetContainerStats(id);
+                var stats = GetStats(id);
                 var rxTotal = Convert.ToUInt64(stats.Networks.Values.Sum(n => Convert.ToDecimal(n.RxBytes)));
                 var txTotal = Convert.ToUInt64(stats.Networks.Values.Sum(n => Convert.ToDecimal(n.TxBytes)));
 
@@ -176,11 +234,6 @@ namespace DockerDash
             };
         }
 
-        static double ConvertBytesToKilo(ulong bytes)
-        {
-            return (bytes / 1024f);
-        }
-
         public void MonitorEvents()
         {
             if (monitorContainersTask == null || monitorContainersTask.Status != TaskStatus.Running)
@@ -206,59 +259,6 @@ namespace DockerDash
                     }
                 }, TaskCreationOptions.LongRunning);
             }
-        }
-
-        public ContainerStatsResponse GetContainerStats(string id)
-        {
-            string stats;
-            using (var stream = docker.Containers.GetContainerStatsAsync(id, new ContainerStatsParameters() { Stream = false }, CancellationToken.None).Result)
-            {
-                using (var sr = new StreamReader(stream))
-                {
-                    stats = sr.ReadLine();
-                }
-            }
-
-            return JsonConvert.DeserializeObject<ContainerStatsResponse>(stats);
-        }
-
-        public string GetContainerLogs(string id, int tail)
-        {
-            var logs = new StringBuilder();
-            using (var stream = docker.Containers.GetContainerLogsAsync(id, new ContainerLogsParameters()
-            {
-                Timestamps = false,
-                Follow = false,
-                ShowStderr = true,
-                ShowStdout = true,
-                Tail = tail.ToString()
-            }, new CancellationTokenSource(5000).Token).Result)
-            {
-                using (var sr = new StreamReader(stream))
-                {
-                    string s = String.Empty;
-                    while ((s = sr.ReadLine()) != null)
-                    {
-                        logs.AppendLine(s);
-                    }
-
-                }
-            };
-
-            return logs.ToString();
-        }
-
-        public static string FormatBytes(ulong input)
-        {
-            long bytes = Convert.ToInt64(input);
-            string[] Suffix = { "B", "KB", "MB", "GB", "TB" };
-            bool isNegative = bytes < 0;
-            if (isNegative) bytes = (-1) * bytes;
-            int i;
-            double dblSByte = bytes;
-            for (i = 0; i < Suffix.Length && bytes >= 1024; i++, bytes /= 1024)
-                dblSByte = bytes / 1024.0;
-            return String.Format("{0:0.##} {1}", isNegative ? (-1) * dblSByte : dblSByte, Suffix[i]);
         }
 
         public ContainerDetailsModel GetContainerDetails(string id)
@@ -339,62 +339,63 @@ namespace DockerDash
             return details;
         }
 
-        public HostModel GetHostInfo()
+        private ContainerStatsResponse GetStats(string id)
         {
-            var info = docker.Miscellaneous.GetSystemInfoAsync().Result;
-            return new HostModel
+            string stats;
+            using (var stream = docker.Containers.GetContainerStatsAsync(id, new ContainerStatsParameters() { Stream = false }, CancellationToken.None).Result)
             {
-                Architecture = info.Architecture,
-                Containers = info.Containers,
-                ContainersPaused = info.ContainersPaused,
-                ContainersRunning = info.ContainersRunning,
-                ContainersStopped = info.ContainersStopped,
-                DefaultRuntime = info.DefaultRuntime,
-                Driver = info.Driver,
-                Id = info.ID,
-                Images = info.Images,
-                KernelVersion = info.KernelVersion,
-                LoggingDriver = info.LoggingDriver,
-                MemTotal = FormatBytes((ulong)info.MemTotal),
-                NCPU = info.NCPU,
-                Name = info.Name,
-                OperatingSystem = info.OperatingSystem,
-                OSType = info.OSType,
-                ServerVersion = info.ServerVersion,
-                ExecutionDriver = info.ExecutionDriver,
-                CgroupDriver = info.CgroupDriver,
-                NGoroutines = info.NGoroutines,
-                SwarmMode = info.Swarm.LocalNodeState,
-                SwarmManagers = info.Swarm.Managers,
-                SwarmNodes = info.Swarm.Nodes
-            };
-        }
-
-        public List<NetworkModel> GetNetworkList()
-        {
-            try
-            {
-                var networks = docker.Networks.ListNetworksAsync().Result;
-                return networks.Select(n =>
+                using (var sr = new StreamReader(stream))
                 {
-                    var net = new NetworkModel
-                    {
-                        Id = n.ID,
-                        Containers = (n.Containers != null && n.Containers.Any()) ? n.Containers.Count() : 0,
-                        Driver = n.Driver,
-                        Name = n.Name,
-                        Scope = n.Scope
-                    };
-
-                    return net;
-                }).OrderBy( n => n.Name).ToList();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(1001, ex, ex.Message);
-                throw;
+                    stats = sr.ReadLine();
+                }
             }
 
+            return JsonConvert.DeserializeObject<ContainerStatsResponse>(stats);
         }
+
+        public string GetContainerLogs(string id, int tail)
+        {
+            var logs = new StringBuilder();
+            using (var stream = docker.Containers.GetContainerLogsAsync(id, new ContainerLogsParameters()
+            {
+                Timestamps = false,
+                Follow = false,
+                ShowStderr = true,
+                ShowStdout = true,
+                Tail = tail.ToString()
+            }, new CancellationTokenSource(5000).Token).Result)
+            {
+                using (var sr = new StreamReader(stream))
+                {
+                    string s = String.Empty;
+                    while ((s = sr.ReadLine()) != null)
+                    {
+                        logs.AppendLine(s);
+                    }
+
+                }
+            };
+
+            return logs.ToString();
+        }
+
+        public static string FormatBytes(ulong input)
+        {
+            long bytes = Convert.ToInt64(input);
+            string[] Suffix = { "B", "KB", "MB", "GB", "TB" };
+            bool isNegative = bytes < 0;
+            if (isNegative) bytes = (-1) * bytes;
+            int i;
+            double dblSByte = bytes;
+            for (i = 0; i < Suffix.Length && bytes >= 1024; i++, bytes /= 1024)
+                dblSByte = bytes / 1024.0;
+            return String.Format("{0:0.##} {1}", isNegative ? (-1) * dblSByte : dblSByte, Suffix[i]);
+        }
+
+        static double ConvertBytesToKilo(ulong bytes)
+        {
+            return (bytes / 1024f);
+        }
+
     }
 }
