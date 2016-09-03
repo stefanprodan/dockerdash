@@ -48,7 +48,7 @@
       "wwwroot/js/main.js"
     ],
     "minify": {
-      "enabled": false,
+      "enabled": true,
       "renameLocals": false
     },
     "sourceMap": false

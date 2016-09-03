@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -435,7 +436,8 @@ namespace DockerDash
                         string s = String.Empty;
                         while ((s = sr.ReadLine()) != null)
                         {
-                            logs.AppendLine(s);
+                            // remove ANSI x3.64 graphic codes
+                            logs.AppendLine(Regex.Replace(s, @"\e\[(\d+;)*(\d+)?[ABCDHJKfmsu]", ""));
                         }
 
                     }

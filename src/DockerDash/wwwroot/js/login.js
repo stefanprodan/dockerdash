@@ -13,7 +13,7 @@
         var $this = this;
     },
     methods: {
-        submit() {
+        submit: function() {
             var credentials = {
                 username: this.credentials.username,
                 password: this.credentials.password

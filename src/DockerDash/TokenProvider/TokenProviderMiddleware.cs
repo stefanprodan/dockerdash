@@ -51,8 +51,6 @@ namespace DockerDash.TokenProvider
                 return context.Response.WriteAsync("Bad request.");
             }
 
-            _logger.LogInformation("Handling request: " + context.Request.Path);
-
             return GenerateToken(context);
         }
 
@@ -64,6 +62,7 @@ namespace DockerDash.TokenProvider
             var identity = await _options.IdentityResolver(username, password);
             if (identity == null)
             {
+                _logger.LogInformation($"Invalid login attempt from {username} with IP {context.Connection.RemoteIpAddress} at {DateTime.Now}");
                 context.Response.StatusCode = 400;
                 await context.Response.WriteAsync("Invalid username or password.");
                 return;
@@ -95,6 +94,8 @@ namespace DockerDash.TokenProvider
                 access_token = encodedJwt,
                 expires_in = (int)_options.Expiration.TotalSeconds
             };
+
+            _logger.LogInformation($"Token generated for {username} IP {context.Connection.RemoteIpAddress} at {DateTime.Now} expires after {_options.Expiration.TotalHours} hours");
 
             // Serialize and return the response
             context.Response.ContentType = "application/json";

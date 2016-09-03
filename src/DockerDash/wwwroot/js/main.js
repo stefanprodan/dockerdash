@@ -58,6 +58,7 @@ var app = Vue.extend({
         };
     },
     ready: function () {
+
         this.authenticated = auth.checkAuth();
 
         if (this.authenticated) {
