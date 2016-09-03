@@ -1,5 +1,5 @@
 ﻿/// <autosync enabled="true" />
-/// <reference path="app/app.js" />
+/// <reference path="app/app.min.js" />
 /// <reference path="app/lib.js" />
 /// <reference path="js/auth.js" />
 /// <reference path="js/base.js" />

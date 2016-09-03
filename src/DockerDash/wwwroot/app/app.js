@@ -1,26 +1,5 @@
 var auth = function () {
     return {
-        login: function (context, creds, redirect) {
-            $this = this;
-            // use application/x-www-form-urlencoded
-            Vue.http.options.emulateJSON = true;
-
-            context.$http.post(window.location.origin + '/token', creds).then(function (response) {
-
-                var access_token = response.json().access_token;
-                localStorage.setItem('access_token', access_token);
-                context.$dispatch('on-login');
-
-                Vue.http.headers.common['Authorization'] = 'Bearer ' + $this.getAccessToken();
-
-                if (redirect) {
-                    router.go(redirect)
-                }
-
-            }, function (response) {
-                context.error = response;
-            });
-        },
         checkAuth: function () {
             if (localStorage.getItem('access_token')) {
                 return true;
@@ -31,9 +10,6 @@ var auth = function () {
         },
         getAccessToken: function () {
             return localStorage.getItem('access_token');
-        },
-        logout: function () {
-            localStorage.removeItem('access_token');
         }
     };
 }();
@@ -49,6 +25,7 @@ var baseMixin = {
     ready: function () {
         var $this = this;
 
+        // append token to signalr query string
         $.connection.hub.qs = { 'authorization': auth.getAccessToken() };
 
         // enable SignalR console logging
@@ -61,7 +38,9 @@ var baseMixin = {
 
         // alert on connection error
         $.connection.hub.error(function (error) {
-            if (error.context && error.context.status == 401)
+
+            // check if token has expired and logout
+            if (error.context && error.context.status === 401)
             {
                 $this.showAlert('Session expired, please login.');
                 $this.$dispatch('do-logout');
@@ -80,9 +59,6 @@ var baseMixin = {
         showAlert: function (message) {
             this.alert.find("p").text(message);
             this.alert.show();
-        },
-        isAuthenticated: function () {
-            auth.checkAuth();
         }
     },
     filters: {
@@ -90,13 +66,13 @@ var baseMixin = {
             return val.substring(0, len);
         },
         statusGlyph: function (val) {
-            if (val == "running") {
+            if (val === "running") {
                 return "glyphicon-play";
             }
-            if (val == "paused") {
+            if (val === "paused") {
                 return "glyphicon-pause";
             }
-            if (val == "restarting") {
+            if (val === "restarting") {
                 return "glyphicon-refresh";
             }
 
@@ -118,14 +94,36 @@ var login = Vue.extend({
     },
     ready: function () {
         var $this = this;
+
+        // remove token if exists
+        if (localStorage.getItem('access_token')) {
+            localStorage.removeItem('access_token');
+        }
     },
     methods: {
-        submit: function() {
-            var credentials = {
-                username: this.credentials.username,
-                password: this.credentials.password
-            }
-            auth.login(this, credentials, 'host')
+        login: function () {
+            var $this = this;
+
+            // use application/x-www-form-urlencoded
+            Vue.http.options.emulateJSON = true;
+
+            this.$http.post(window.location.origin + '/token', this.credentials).then(function (response) {
+                // store token in local storage
+                var access_token = response.json().access_token;
+                localStorage.setItem('access_token', access_token);
+
+                // notify app that user is authenticated
+                $this.$dispatch('on-login');
+
+                // set global authorization header
+                Vue.http.headers.common['Authorization'] = 'Bearer ' + access_token;
+
+                // redirect to root
+                router.go('/')
+
+            }, function (response) {
+                $this.error = response.body;
+            });
         }
     },
     route: {
@@ -437,7 +435,7 @@ var app = Vue.extend({
     },
     methods: {
         logout: function () {
-            auth.logout();
+            localStorage.removeItem('access_token');
             this.authenticated = false;
             this.$route.router.go('/login');
         }

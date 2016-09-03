@@ -9,6 +9,7 @@
     ready: function () {
         var $this = this;
 
+        // append token to signalr query string
         $.connection.hub.qs = { 'authorization': auth.getAccessToken() };
 
         // enable SignalR console logging
@@ -21,7 +22,9 @@
 
         // alert on connection error
         $.connection.hub.error(function (error) {
-            if (error.context && error.context.status == 401)
+
+            // check if token has expired and logout
+            if (error.context && error.context.status === 401)
             {
                 $this.showAlert('Session expired, please login.');
                 $this.$dispatch('do-logout');
@@ -40,9 +43,6 @@
         showAlert: function (message) {
             this.alert.find("p").text(message);
             this.alert.show();
-        },
-        isAuthenticated: function () {
-            auth.checkAuth();
         }
     },
     filters: {
@@ -50,13 +50,13 @@
             return val.substring(0, len);
         },
         statusGlyph: function (val) {
-            if (val == "running") {
+            if (val === "running") {
                 return "glyphicon-play";
             }
-            if (val == "paused") {
+            if (val === "paused") {
                 return "glyphicon-pause";
             }
-            if (val == "restarting") {
+            if (val === "restarting") {
                 return "glyphicon-refresh";
             }
 

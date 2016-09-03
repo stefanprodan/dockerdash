@@ -67,7 +67,7 @@ var app = Vue.extend({
     },
     methods: {
         logout: function () {
-            auth.logout();
+            localStorage.removeItem('access_token');
             this.authenticated = false;
             this.$route.router.go('/login');
         }
