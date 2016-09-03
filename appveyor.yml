@@ -19,6 +19,8 @@ on_success:
   - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
   - git config --global user.email "$($env:git_email)"
   - git config --global user.name "Stefan Prodan"
+  - git config --global core.autocrlf true
+  - git checkout master
   - git add .
   - git commit -m "ci deploy"
   - git status
