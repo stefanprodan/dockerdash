@@ -38,6 +38,13 @@
         $.connection.hub.reconnected(function () {
             $this.showAlert('Reconnected to SignalR hub, transport ' + $.connection.hub.transport.name);
         });
+
+        // reconnect on wakeup for mobile devices
+        ifvisible.on("wakeup", function () {
+            if ($.connection.hub && $.connection.hub.state === $.signalR.connectionState.disconnected) {
+                $.connection.hub.start();
+            }
+        });
     },
     methods: {
         showAlert: function (message) {

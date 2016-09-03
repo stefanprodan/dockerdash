@@ -7,6 +7,7 @@
     "jquery-validation": "1.14.0",
     "jquery-validation-unobtrusive": "3.2.6",
     "vue": "1.0.21",
-    "vue-router": "0.7.13"
+    "vue-router": "0.7.13",
+    "ifvisible.js": "1.0.6"
   }
 }

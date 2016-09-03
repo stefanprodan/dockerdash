@@ -54,6 +54,13 @@ var baseMixin = {
         $.connection.hub.reconnected(function () {
             $this.showAlert('Reconnected to SignalR hub, transport ' + $.connection.hub.transport.name);
         });
+
+        // reconnect on wakeup for mobile devices
+        ifvisible.on("wakeup", function () {
+            if ($.connection.hub && $.connection.hub.state === $.signalR.connectionState.disconnected) {
+                $.connection.hub.start();
+            }
+        });
     },
     methods: {
         showAlert: function (message) {
@@ -422,6 +429,7 @@ router.beforeEach(function (transition) {
 var app = Vue.extend({
     data: function () {
         return {
+            alert: $('#alert'),
             authenticated: false
         };
     },
@@ -438,6 +446,13 @@ var app = Vue.extend({
             localStorage.removeItem('access_token');
             this.authenticated = false;
             this.$route.router.go('/login');
+        },
+        showAlert: function (message) {
+            this.alert.find("p").text(message);
+            this.alert.show();
+        },
+        closeAlert: function () {
+            this.alert.hide();
         }
     },
     events: {

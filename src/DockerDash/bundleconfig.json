@@ -13,7 +13,8 @@
       "wwwroot/lib/vue/dist/vue.min.js",
       "wwwroot/lib/vue-router/dist/vue-router.min.js",
       "wwwroot/lib/vue-resource/vue-resource.min.js",
-      "wwwroot/lib/signalr/jquery.signalr-2.2.1.min.js"
+      "wwwroot/lib/signalr/jquery.signalr-2.2.1.min.js",
+      "wwwroot/lib/ifvisible.js/src/ifvisible.min.js"
     ],
     "minify": {
       "enabled": false,
