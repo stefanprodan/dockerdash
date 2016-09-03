@@ -261,11 +261,15 @@ var container = Vue.extend({
         loadDetails: function () {
             var $this = this;
             this.mainHub.server.getContainerDetails(this.id).then(function (details) {
-                $this.con = details;
-                if ($this.con.State == "running") {
-                    $this.loadStats();
+                if (details === undefined) {
+                    $this.showAlert("Container not found");
                 } else {
-                    $this.mem = null;
+                    $this.con = details;
+                    if ($this.con.State == "running") {
+                        $this.loadStats();
+                    } else {
+                        $this.mem = null;
+                    }
                 }
             });
         },
@@ -278,16 +282,16 @@ var container = Vue.extend({
         loadStats: function () {
             var $this = this;
             this.mainHub.server.getContainerStats(this.id).then(function (data) {
-
-                // update stats
-                $this.mem = data.memory.label;
-                $this.rxTotal = data.network.labelrx;
-                $this.txTotal = data.network.labeltx;
-                $this.iorxTotal = data.io.labelrx;
-                $this.iotxTotal = data.io.labeltx;
-                $this.pids = data.pids;
-                $this.cpuTime = data.cpuTime;
-
+                if (data) {
+                    // update stats
+                    $this.mem = data.memory.label;
+                    $this.rxTotal = data.network.labelrx;
+                    $this.txTotal = data.network.labeltx;
+                    $this.iorxTotal = data.io.labelrx;
+                    $this.iotxTotal = data.io.labeltx;
+                    $this.pids = data.pids;
+                    $this.cpuTime = data.cpuTime;
+                }
                 //// add new memory data
                 //$this.memChart.data.labels.push(data.memory.label);
                 //$this.memChart.data.datasets[0].data.push(data.memory.value);

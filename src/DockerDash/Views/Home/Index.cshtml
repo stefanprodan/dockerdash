@@ -237,10 +237,10 @@
 <script id="container" type="x-template">
     <div class="js-container" v-cloak>
         <div class="row">
-            <div class="col-lg-5 col-md-5 ">
+            <div class="col-lg-5 col-md-5" v-if="con">
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="panel panel-default" v-if="con">
+                        <div class="panel panel-default">
                             <div class="panel-heading master">
                                 <h3 class="panel-title"><span class="glyphicon glyphicon-star"></span> {{ con.Name }}</h3>
                             </div>
@@ -304,9 +304,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-7 col-md-7 json-pannels">
+            <div class="col-lg-7 col-md-7 json-pannels" v-if="con">
                 <div class="page-container">
-                    <div role="tabpanel" v-if="con">
+                    <div role="tabpanel">
                         <ul class="nav nav-tabs" role="tablist">
                             <li role="presentation" class="active"><a href="#props" aria-controls="props" role="tab" data-toggle="tab">Props</a></li>
                             <li role="presentation"><a href="#logs" aria-controls="logs" role="tab" data-toggle="tab">Logs</a></li>

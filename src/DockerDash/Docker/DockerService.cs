@@ -390,8 +390,15 @@ namespace DockerDash
             }
             catch (Exception ex)
             {
-                _logger.LogError(1001, ex, ex.Message);
-                throw;
+                if (ex.InnerException is DockerContainerNotFoundException)
+                {
+                    return null;
+                }
+                else
+                {
+                    _logger.LogError(1001, ex, ex.Message);
+                    throw;
+                }
             }
         }
 
@@ -447,8 +454,15 @@ namespace DockerDash
             }
             catch (Exception ex)
             {
-                _logger.LogError(1001, ex, ex.Message);
-                throw;
+                if (ex.InnerException is DockerContainerNotFoundException)
+                {
+                    return null;
+                }
+                else
+                {
+                    _logger.LogError(1001, ex, ex.Message);
+                    throw;
+                }
             }
         }
 
