@@ -24,6 +24,7 @@ nuget.exe
 *.ipch
 .vs/
 .sass-cache/
+tmp/
 project.lock.json
 
 bower_components/

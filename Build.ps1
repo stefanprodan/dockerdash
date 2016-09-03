@@ -51,6 +51,8 @@ function Exec
 }
 
 if(Test-Path .\artifacts) { Remove-Item .\artifacts -Force -Recurse }
+if(Test-Path .\tmp) { Remove-Item .\tmp -Force -Recurse }
+if(Test-Path .\release) { Remove-Item .\release -Force -Recurse }
 
 EnsurePsbuildInstalled
 
@@ -64,3 +66,21 @@ $revision = "{0:D4}" -f [convert]::ToInt32($revision, 10)
 exec { & dotnet restore .\src\Docker.DotNet }
 exec { & dotnet restore .\src\DockerDash }
 exec { & dotnet build .\src\DockerDash }
+
+$release = Join-Path $pwd release
+exec { & dotnet publish .\src\DockerDash -c Release -o $release --version-suffix=$revision}
+
+$packToZip = $false
+if($packToZip){
+
+    $tmp = Join-Path $pwd tmp
+    exec { & dotnet publish .\src\DockerDash -c Release -o $tmp --version-suffix=$revision}
+
+    # zip pack to .\artifacts\name-version.zip
+    $json = Get-Content -Raw -Path (Join-Path $pwd 'src\DockerDash\project.json') | ConvertFrom-Json
+    $version = $json.version
+    $pack = Join-Path $pwd "artifacts/dockerdash-${version}.zip"
+    New-Item -ItemType Directory -Force -Path (Join-Path $pwd artifacts) | Out-Null
+    Add-Type -Assembly "System.IO.Compression.FileSystem"
+    [System.IO.Compression.ZipFile]::CreateFromDirectory($tmp, $pack)
+}
