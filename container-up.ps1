@@ -4,7 +4,7 @@
 if(docker images -q dockerdash){
     "using existing dockerdash image" 
 }else{
-    docker build -t dockerdash .
+    docker build -t dockerdash -f Dockerfile.debug .
 }
 
 # run container

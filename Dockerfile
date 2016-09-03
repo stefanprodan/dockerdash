@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:latest
+FROM microsoft/dotnet:1.0.0-core
 
 MAINTAINER Stefan Prodan
 
@@ -7,34 +7,20 @@ ENV DOCKER_REMOTE_API="unix:///var/run/docker.sock"
 
 # Set ASP.NET Core environment variables
 ENV ASPNETCORE_URLS="http://*:5050"
-ENV ASPNETCORE_ENVIRONMENT="Staging"
+ENV ASPNETCORE_ENVIRONMENT="Production"
 
 # Set user/pass
 ENV DOCKERDASH_USER="admin"
 ENV DOCKERDASH_PASSWORD="changeme"
 
 # Copy files to app directory
-COPY /src/Docker.DotNet /app/src/Docker.DotNet
-COPY /src/DockerDash /app/src/DockerDash
-
-# add myget aspnetmaster
-COPY NuGet.Config /app/src/DockerDash/NuGet.Config
-
-# Restore Docker.DotNet packages
-WORKDIR /app/src/Docker.DotNet
-RUN ["dotnet", "restore"]
+COPY /release /app
 
 # Set working directory
-WORKDIR /app/src/DockerDash
-
-# Restore DockerDash packages
-RUN ["dotnet", "restore"]
-
-# Build DockerDash
-RUN ["dotnet", "build"]
+WORKDIR /app
 
 # Open port
 EXPOSE 5050/tcp
 
 # Run
-ENTRYPOINT ["dotnet", "run"]
+ENTRYPOINT ["dotnet", "DockerDash.dll"]
