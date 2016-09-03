@@ -31,11 +31,11 @@ namespace DockerDash
             docker = new DockerClientConfiguration(new Uri(Host)).CreateClient();
         }
 
-        public HostModel GetHostInfo()
+        public async Task<HostModel> GetHostInfo()
         {
             try
             {
-                var info = docker.Miscellaneous.GetSystemInfoAsync().Result;
+                var info = await docker.Miscellaneous.GetSystemInfoAsync();
                 return new HostModel
                 {
                     Architecture = info.Architecture,
@@ -70,14 +70,14 @@ namespace DockerDash
             }
         }
 
-        public List<ContainerModel> GetContainerList()
+        public async Task<List<ContainerModel>> GetContainerList()
         {
             try
             {
-                var containers = docker.Containers.ListContainersAsync(new ContainersListParameters()
+                var containers = await docker.Containers.ListContainersAsync(new ContainersListParameters()
                 {
                     All = true
-                }).Result;
+                });
 
                 return containers.Select(c =>
                 {
@@ -111,11 +111,11 @@ namespace DockerDash
             }
         }
 
-        public List<NetworkModel> GetNetworkList()
+        public async Task<List<NetworkModel>> GetNetworkList()
         {
             try
             {
-                var networks = docker.Networks.ListNetworksAsync().Result;
+                var networks = await docker.Networks.ListNetworksAsync();
                 return networks.Select(n =>
                 {
                     var net = new NetworkModel
@@ -138,14 +138,14 @@ namespace DockerDash
 
         }
 
-        public List<ImageModel> GetImageList()
+        public async Task<List<ImageModel>> GetImageList()
         {
             try
             {
-                var images = docker.Images.ListImagesAsync(new ImagesListParameters()
+                var images = await docker.Images.ListImagesAsync(new ImagesListParameters()
                 {
                     All = false
-                }).Result;
+                });
 
                 if (images == null || !images.Any())
                 {
@@ -198,14 +198,14 @@ namespace DockerDash
             }
         }
 
-        public dynamic GetContainerStats(string id)
+        public async Task<dynamic> GetContainerStats(string id)
         {
             try
             {
-                var inspec = docker.Containers.InspectContainerAsync(id).Result;
+                var inspec = await docker.Containers.InspectContainerAsync(id);
                 if (inspec.State.Running)
                 {
-                    var stats = GetStats(id);
+                    var stats = await GetStats(id);
                     var rxTotal = Convert.ToUInt64(stats.Networks.Values.Sum(n => Convert.ToDecimal(n.RxBytes)));
                     var txTotal = Convert.ToUInt64(stats.Networks.Values.Sum(n => Convert.ToDecimal(n.TxBytes)));
 
@@ -302,11 +302,11 @@ namespace DockerDash
             }
         }
 
-        public ContainerDetailsModel GetContainerDetails(string id)
+        public async Task<ContainerDetailsModel> GetContainerDetails(string id)
         {
             try
             {
-                var inspec = docker.Containers.InspectContainerAsync(id).Result;
+                var inspec = await docker.Containers.InspectContainerAsync(id);
 
                 var details = new ContainerDetailsModel
                 {
@@ -402,12 +402,12 @@ namespace DockerDash
             }
         }
 
-        private ContainerStatsResponse GetStats(string id)
+        private async Task<ContainerStatsResponse> GetStats(string id)
         {
             try
             {
                 string stats;
-                using (var stream = docker.Containers.GetContainerStatsAsync(id, new ContainerStatsParameters() { Stream = false }, CancellationToken.None).Result)
+                using (var stream = await docker.Containers.GetContainerStatsAsync(id, new ContainerStatsParameters() { Stream = false }, CancellationToken.None))
                 {
                     using (var sr = new StreamReader(stream))
                     {
@@ -424,19 +424,19 @@ namespace DockerDash
             }
         }
 
-        public string GetContainerLogs(string id, int tail)
+        public async Task<string> GetContainerLogs(string id, int tail)
         {
             try
             {
                 var logs = new StringBuilder();
-                using (var stream = docker.Containers.GetContainerLogsAsync(id, new ContainerLogsParameters()
+                using (var stream = await docker.Containers.GetContainerLogsAsync(id, new ContainerLogsParameters()
                 {
                     Timestamps = false,
                     Follow = false,
                     ShowStderr = true,
                     ShowStdout = true,
                     Tail = tail.ToString()
-                }, new CancellationTokenSource(5000).Token).Result)
+                }, new CancellationTokenSource(5000).Token))
                 {
                     using (var sr = new StreamReader(stream))
                     {
@@ -466,7 +466,7 @@ namespace DockerDash
             }
         }
 
-        public static string FormatBytes(ulong input)
+        static string FormatBytes(ulong input)
         {
             long bytes = Convert.ToInt64(input);
             string[] Suffix = { "B", "KB", "MB", "GB", "TB" };

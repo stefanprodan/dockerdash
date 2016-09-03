@@ -16,51 +16,50 @@ namespace DockerDash
             _dockerService = dockerService;
         }
 
-        public dynamic GetHost()
+        public async Task<dynamic> GetHost()
         {
             return new
             {
-                host = _dockerService.GetHostInfo(),
-                containers = _dockerService.GetContainerList(),
-                images = _dockerService.GetImageList(),
-                networks = _dockerService.GetNetworkList()
+                host = await _dockerService.GetHostInfo(),
+                containers = await _dockerService.GetContainerList(),
+                images = await _dockerService.GetImageList(),
+                networks = await _dockerService.GetNetworkList()
             };
         }
 
-        public dynamic GetHostInfo()
+        public async Task<dynamic> GetHostInfo()
         {
-            return _dockerService.GetHostInfo();
+            return await _dockerService.GetHostInfo();
         }
 
-        public dynamic GetContainerList()
+        public async Task<dynamic> GetContainerList()
         {
-            var list = _dockerService.GetContainerList();
-            return list;
+            return await _dockerService.GetContainerList();
         }
 
-        public dynamic GetImageList()
+        public async Task<dynamic> GetImageList()
         {
-            return _dockerService.GetImageList();
+            return await _dockerService.GetImageList();
         }
 
-        public dynamic GetNetworkList()
+        public async Task<dynamic> GetNetworkList()
         {
-            return _dockerService.GetNetworkList();
+            return await _dockerService.GetNetworkList();
         }
 
-        public dynamic GetContainerDetails(string id)
+        public async Task<dynamic> GetContainerDetails(string id)
         {
-            return _dockerService.GetContainerDetails(id);
+            return await _dockerService.GetContainerDetails(id);
         }
 
-        public dynamic GetContainerLogs(string id, int tail)
+        public async Task<dynamic> GetContainerLogs(string id, int tail)
         {
-            return _dockerService.GetContainerLogs(id, tail);
+            return await _dockerService.GetContainerLogs(id, tail);
         }
 
-        public dynamic GetContainerStats(string id)
+        public async Task<dynamic> GetContainerStats(string id)
         {
-            return _dockerService.GetContainerStats(id);
+            return await _dockerService.GetContainerStats(id);
         }
     }
 }
