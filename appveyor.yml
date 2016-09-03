@@ -9,3 +9,17 @@ nuget:
 build_script:
 - ps: .\Build.ps1
 test: off
+environment:
+  access_token:
+    secure: UdsFh1+gLuPPgH0byZBBxH7Ue6tILfmpflXwZJ0ZZu0XeQ2dANyLeN/fWWpKVcOy
+  git_email:
+    secure: nq2fO/Zi7xCmkD38qvSMsjT/f/Hqpb87wx9Ci4VIjmA=
+on_success:
+  - git config --global credential.helper store
+  - ps: Add-Content "$env:USERPROFILE\.git-credentials" "https://$($env:access_token):x-oauth-basic@github.com`n"
+  - git config --global user.email "$($env:git_email)"
+  - git config --global user.name "Stefan Prodan"
+  - git add .
+  - git commit -m "ci deploy"
+  - git status
+  - git push -f origin release
