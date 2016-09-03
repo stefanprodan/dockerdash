@@ -24,4 +24,4 @@ on_success:
   - git add .
   - git commit -m "ci deploy"
   - git status
-  - git push origin master:release
+  - git push origin master:release -f
