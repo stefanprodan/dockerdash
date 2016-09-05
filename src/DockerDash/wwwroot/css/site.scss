@@ -35,8 +35,7 @@ canvas {
 }
 
 .break {
-    word-wrap:break-word;
-    white-space: normal;
+    word-break: break-all;
 }
 
 .two-cols-stats {
@@ -48,8 +47,8 @@ canvas {
 		padding: 3px 10px 3px 7px;
 		float: left;
 		border-right: 1px solid #efefef;
-		min-width: 33%;
-		font-size: 11px; 
+		width: 33%;
+		font-size: 11px;
 		&:nth-child(3n+1) {
 			padding-left: 0;
 		}
@@ -62,7 +61,10 @@ canvas {
 		strong {
 			display: block;
 			font-size: 13px;
-			color: #333; 
+			color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; 
 		}
 	}
 	@media (max-width: 425px) {
@@ -70,7 +72,8 @@ canvas {
 			display: block;
 			float: none;
 			border: none;
-			padding-left: 0; 
+			padding-left: 0;
+            width: 100%; 
 			strong {
 				display: inline; 
 			}
@@ -407,6 +410,8 @@ h3.panel-title {
                 border: 0;
                 border-radius: 0;
                 color: #fff;
+                font-size: 13px;
+                padding: 10px;
                 &:hover {
                     color: #fff;
                     background: darken($themeOrange, 10%);
@@ -483,6 +488,7 @@ h3.panel-title {
             .name {
                 font-size: 120%;
                 display: block;
+                word-break: break-all;
             }
         }
         .list-item-body {
@@ -519,11 +525,18 @@ h3.panel-title {
         margin: 0;
         li {
             padding: 0 0 10px;
+            position: relative;
             small {
                 color: #999;
                 font-size: 11px;
                 width: 60px;
                 display: inline-block;
+                position: absolute;
+                top: 3px;
+            }
+            span {
+                padding-left: 70px;
+                display: block;
             }
             a {
                 color: $themeOrange;

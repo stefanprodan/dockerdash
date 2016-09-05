@@ -28,8 +28,7 @@ canvas {
   -ms-user-select: none; }
 
 .break {
-  word-wrap: break-word;
-  white-space: normal; }
+  word-break: break-all; }
 
 .two-cols-stats {
   color: #999;
@@ -40,7 +39,7 @@ canvas {
     padding: 3px 10px 3px 7px;
     float: left;
     border-right: 1px solid #efefef;
-    min-width: 33%;
+    width: 33%;
     font-size: 11px; }
     .two-cols-stats span:nth-child(3n+1) {
       padding-left: 0; }
@@ -51,13 +50,17 @@ canvas {
     .two-cols-stats span strong {
       display: block;
       font-size: 13px;
-      color: #333; }
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis; }
   @media (max-width: 425px) {
     .two-cols-stats span {
       display: block;
       float: none;
       border: none;
-      padding-left: 0; }
+      padding-left: 0;
+      width: 100%; }
       .two-cols-stats span strong {
         display: inline; } }
 
@@ -301,7 +304,9 @@ h3.panel-title {
     .json-pannels .nav-tabs > li > a {
       border: 0;
       border-radius: 0;
-      color: #fff; }
+      color: #fff;
+      font-size: 13px;
+      padding: 10px; }
       .json-pannels .nav-tabs > li > a:hover {
         color: #fff;
         background: #1e95c9; }
@@ -359,7 +364,8 @@ h3.panel-title {
       top: 8px; }
     .json-pannels .list-group-item .list-item-title .name {
       font-size: 120%;
-      display: block; }
+      display: block;
+      word-break: break-all; }
   .json-pannels .list-group-item .list-item-body {
     display: block;
     padding: 5px 10px; }
@@ -383,12 +389,18 @@ h3.panel-title {
   padding: 0;
   margin: 0; }
   .about ul li {
-    padding: 0 0 10px; }
+    padding: 0 0 10px;
+    position: relative; }
     .about ul li small {
       color: #999;
       font-size: 11px;
       width: 60px;
-      display: inline-block; }
+      display: inline-block;
+      position: absolute;
+      top: 3px; }
+    .about ul li span {
+      padding-left: 70px;
+      display: block; }
     .about ul li a {
       color: #39aee1; }
 
