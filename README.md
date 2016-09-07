@@ -55,3 +55,21 @@ stefanprodan/dockerdash
 * JWT auth
 * Vuejs
 * Bootstrap
+
+### Screenshots 
+
+***Host containers***
+
+![Containers](https://raw.githubusercontent.com/stefanprodan/dockerdash/master/screens/host-containers-dockerdash.png)
+
+***Container detais***
+
+![Container](https://raw.githubusercontent.com/stefanprodan/dockerdash/master/screens/container-details-dockerdash.png)
+
+***Host images***
+
+![Containers](https://raw.githubusercontent.com/stefanprodan/dockerdash/master/screens/host-images-dockerdash.png)
+
+***Host networks***
+
+![Containers](https://raw.githubusercontent.com/stefanprodan/dockerdash/master/screens/host-networks-dockerdash.png)
