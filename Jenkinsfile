@@ -1,13 +1,29 @@
 #!groovy
 
+import groovy.json.JsonSlurperClassic
+
+def getVersion(def projectJson){
+    def slurper = new JsonSlurperClassic()
+    project = slurper.parseText(projectJson)
+    slurper = null
+    return project.version.split('-')[0]
+}
+
+def version, revision
+
 node {
    stage('Checkout') {
         checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, 
             extensions: [[$class: 'CleanBeforeCheckout']], 
             submoduleCfg: [], 
             userRemoteConfigs: [[credentialsId: 'spgit', url: 'https://github.com/stefanprodan/dockerdash']]])
+            
+        version = getVersion(readFile('src/DockerDash/project.json'))
+        revision = version + "-" + sprintf("%04d", env.BUILD_NUMBER.toInteger())
    }
    stage('Build') {
+        println "Building version $version revision $revision"
+        
         def dotnet = docker.image('microsoft/dotnet:latest')
         dotnet.inside('-u root') {
             // restore NuGet packages for all projects in solution
@@ -19,6 +35,8 @@ node {
             sh("chown -R 1000 src")
             sh("chown -R 1000 release")
         }
+        
+        archiveArtifacts artifacts: 'release/**/*', fingerprint: true
    }
    stage('Test') {
        step([$class: 'XUnitBuilder', testTimeMargin: '3000', thresholdMode: 1, 
@@ -31,15 +49,15 @@ node {
             pattern: '**/*.testresult', skipNoTestFiles: true, stopProcessingIfError: true]]])
    }
    stage('Publish') {
-        def image = docker.build("dockerdash:1.0.0.${env.BUILD_NUMBER}")
+        def image = docker.build("dockerdash:$revision")
         docker.withRegistry("https://nexus.osmyk.com", "nexus") {
             image.push()
             image.push('latest')
         }
    }
    stage('Clean') {
-       sh("docker rmi -f nexus.osmyk.com/dockerdash:latest")
-        sh("docker rmi -f nexus.osmyk.com/dockerdash:1.0.0.${env.BUILD_NUMBER}")
-        sh("docker rmi -f dockerdash:1.0.0.${env.BUILD_NUMBER}")
+        sh("docker rmi -f nexus.osmyk.com/dockerdash:latest || :")
+        sh("docker rmi -f nexus.osmyk.com/dockerdash:$revision || :")
+        sh("docker rmi -f dockerdash:$revision || :")
    }
 }
