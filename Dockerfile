@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:1.0.0-core
+FROM microsoft/dotnet:1.0.1-core
 
 MAINTAINER Stefan Prodan
 

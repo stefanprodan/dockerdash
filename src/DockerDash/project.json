@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-beta1",
+  "version": "1.0.0-rc1",
   "description": "Docker dashboard built with ASP.NET Core, Docker.DotNet, SignalR and Vuejs",
   "authors": [ "Stefan Prodan" ],
   "packOptions": {
@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "Microsoft.NETCore.App": {
-      "version": "1.0.0",
+      "version": "1.0.1",
       "type": "platform"
     },
     "Microsoft.AspNetCore.Diagnostics": "1.0.0",
