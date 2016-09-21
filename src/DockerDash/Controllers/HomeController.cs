@@ -10,7 +10,7 @@ namespace DockerDash.Controllers
     {
         public HomeController(DockerService dockerService)
         {
-            dockerService.MonitorEvents();
+            //dockerService.MonitorEvents();
 
         }
         public IActionResult Index()

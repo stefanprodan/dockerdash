@@ -56,8 +56,8 @@ namespace DockerDash
                 var dockerAddress = Environment.GetEnvironmentVariable("DOCKER_REMOTE_API");
                 if (string.IsNullOrEmpty(dockerAddress))
                 {
-                    services.Configure<DockerHost>(Configuration.GetSection("DockerHostTest"));
-                    //throw new Exception("DOCKER_REMOTE_API environment variable not found");
+                    //services.Configure<DockerHost>(Configuration.GetSection("DockerHostTest"));
+                    throw new Exception("DOCKER_REMOTE_API environment variable not found");
                 }
                 else
                 {
@@ -70,15 +70,15 @@ namespace DockerDash
                 user = Environment.GetEnvironmentVariable("DOCKERDASH_USER");
                 if (string.IsNullOrEmpty(user))
                 {
-                    user = Configuration["User"];
-                    //throw new Exception("DOCKERDASH_USER environment variable not found");
+                    //user = Configuration["User"];
+                    throw new Exception("DOCKERDASH_USER environment variable not found");
                 }
 
                 password = Environment.GetEnvironmentVariable("DOCKERDASH_PASSWORD");
                 if (string.IsNullOrEmpty(password))
                 {
-                    password = Configuration["Password"];
-                    //throw new Exception("DOCKERDASH_PASSWORD environment variable not found");
+                    //password = Configuration["Password"];
+                    throw new Exception("DOCKERDASH_PASSWORD environment variable not found");
                 }
             }
 
@@ -139,7 +139,7 @@ namespace DockerDash
                     defaults: new { controller = "Home", action = "Index" });
             });
 
-            dockerService.MonitorEvents();
+            //dockerService.MonitorEvents();
         }
     }
 }
