@@ -1,7 +1,7 @@
 # dockerdash
 
 [![Build status](https://ci.appveyor.com/api/projects/status/q52dkb8di4578mh9?svg=true)](https://ci.appveyor.com/project/stefanprodan/dockerdash)
-
+[![Layers](https://images.microbadger.com/badges/image/stefanprodan/dockerdash.svg)](https://microbadger.com/images/stefanprodan/dockerdash)
 
 Docker dashboard is compatible with Docker v1.12.x
 
