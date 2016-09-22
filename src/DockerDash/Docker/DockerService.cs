@@ -94,10 +94,18 @@ namespace DockerDash
 
                     if (cont.State.ToLowerInvariant() == "running")
                     {
-                    //var stats = GetContainerStats(c.ID);
-                    //cont.MemoryUsage = FormatBytes(stats.MemoryStats.Usage);
-                    cont.IpAddress = c.NetworkSettings.Networks.Select(n => n.Value.IPAddress).Aggregate((current, next) => current + ", " + next);
-                        cont.Ports = c.Ports.Select(n => n.PrivatePort.ToString() + "/" + n.Type).Aggregate((current, next) => current + ", " + next);
+                        //var stats = GetContainerStats(c.ID);
+                        //cont.MemoryUsage = FormatBytes(stats.MemoryStats.Usage);
+
+                        if (c.NetworkSettings != null && c.NetworkSettings.Networks.Any())
+                        {
+                            cont.IpAddress = c.NetworkSettings.Networks.Select(n => n.Value.IPAddress).Aggregate((current, next) => current + ", " + next);
+                        }
+
+                        if (c.Ports.Any())
+                        {
+                            cont.Ports = c.Ports.Select(n => n.PrivatePort.ToString() + "/" + n.Type).Aggregate((current, next) => current + ", " + next);
+                        }
                     }
 
                     return cont;

@@ -139,7 +139,7 @@ namespace DockerDash
                     defaults: new { controller = "Home", action = "Index" });
             });
 
-            //dockerService.MonitorEvents();
+            dockerService.MonitorEvents();
         }
     }
 }
