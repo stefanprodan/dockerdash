@@ -8,11 +8,14 @@ namespace DockerDash.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly DockerService _dockerService;
+
         public HomeController(DockerService dockerService)
         {
+            _dockerService = dockerService;
             dockerService.MonitorEvents();
-
         }
+
         public IActionResult Index()
         {
             return View();
@@ -21,6 +24,23 @@ namespace DockerDash.Controllers
         public IActionResult Error()
         {
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult Ingest([FromBody]Payload payload)
+        {
+            return new EmptyResult();
+        }
+
+        public class Payload
+        {
+            public string Log { get; set; }
+        }
+
+        [HttpGet]
+        public IActionResult Healthcheck()
+        {
+            return _dockerService.IsMonitoringEvents() ? StatusCode(200) : StatusCode(500);
         }
     }
 }

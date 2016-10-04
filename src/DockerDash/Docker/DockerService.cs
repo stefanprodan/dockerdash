@@ -310,6 +310,11 @@ namespace DockerDash
             }
         }
 
+        public bool IsMonitoringEvents()
+        {
+            return monitorContainersTask != null && monitorContainersTask.Status == TaskStatus.Running;
+        }
+
         public async Task<ContainerDetailsModel> GetContainerDetails(string id)
         {
             try

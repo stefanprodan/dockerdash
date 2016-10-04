@@ -22,5 +22,7 @@ WORKDIR /app
 # Open port
 EXPOSE 5050/tcp
 
+HEALTHCHECK CMD curl --fail http://localhost:5050/home/healthcheck || exit 1
+
 # Run
 ENTRYPOINT ["dotnet", "DockerDash.dll"]
