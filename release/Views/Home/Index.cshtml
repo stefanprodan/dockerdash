@@ -1,0 +1,413 @@
+﻿<div id="alert" class="alert alert-info alert-dismissible" role="alert" style="display:none;">
+    <button type="button" class="close" aria-label="Close" v-on:click="closeAlert()"><span aria-hidden="true">&times;</span></button>
+    <p></p>
+</div>
+
+
+<template id="login" type="x-template">
+    <div class="col-sm-4 col-sm-offset-4" v-cloak>
+        <h2>Log In</h2>
+        <div class="alert alert-danger" v-if="error">
+            <p>{{ error }}</p>
+        </div>
+        <div class="form-group">
+            <input type="text"
+                   class="form-control"
+                   placeholder="Enter your username"
+                   v-model="credentials.username">
+        </div>
+        <div class="form-group">
+            <input type="password"
+                   class="form-control"
+                   placeholder="Enter your password"
+                   v-model="credentials.password"
+                   v-on:keyup.13="submit()">
+        </div>
+        <button class="btn btn-primary" v-on:click="login()">Login</button>
+    </div>
+</template>
+
+<script id="host" type="x-template">
+    <div class="js-container" v-cloak>
+        <div class="row">
+            <div class="col-lg-5 col-md-5 " v-if="host">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading master">
+                                <h3 class="panel-title"><span class="glyphicon glyphicon-home"></span> Host</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="two-cols-stats">
+                                    <span>
+                                        <strong>{{ host.Name }}</strong> Name
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.NCPU }}</strong> CPU
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.MemTotal }}</strong> Memory
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.OperatingSystem }}</strong> OS
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.KernelVersion }}</strong> Kernel
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.Architecture }}</strong> Architecture
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading master">
+                                <h3 class="panel-title"><span class="glyphicon glyphicon-flash"></span> Docker server</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="two-cols-stats">
+                                    <span>
+                                        <strong>{{ host.ServerVersion }}</strong> Version
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.DefaultRuntime }}</strong> Runtime
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.NGoroutines }}</strong> Goroutines
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.Driver }}</strong> Driver
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.CgroupDriver }}</strong> Cgroup driver
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.LoggingDriver }}</strong> Logging driver
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading master">
+                                <h3 class="panel-title"><span class="glyphicon glyphicon-tasks"></span> Containers</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="two-cols-stats">
+                                    <span>
+                                        <strong>{{ host.ContainersRunning }}</strong> Running
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.ContainersPaused }}</strong> Paused
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.ContainersStopped }}</strong> Stopped
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading master">
+                                <h3 class="panel-title"><span class="glyphicon glyphicon-cloud"></span> Swarm</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="two-cols-stats">
+                                    <span>
+                                        <strong>{{ host.SwarmMode }}</strong> Swarm mode
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.SwarmManagers }}</strong> Managers
+                                    </span>
+                                    <span>
+                                        <strong>{{ host.SwarmNodes }}</strong> Nodes
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7 col-md-7  json-pannels" v-if="host">
+
+                <div class="page-container">
+                    <div role="tabpanel" v-if="containers">
+
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#containerList" aria-controls="containerList" role="tab" data-toggle="tab">{{ countCon }} Containers</a></li>
+                            <li role="presentation"><a href="#imagesList" aria-controls="imagesList" role="tab" data-toggle="tab">{{ countImg }} Images</a></li>
+                            <li role="presentation"><a href="#netList" aria-controls="netList" role="tab" data-toggle="tab">{{ countNet }} Networks</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+
+                            <div role="tabpanel" class="tab-pane active" id="containerList">
+                                <div class="input-group search">
+                                    <input type="text" class="form-control" placeholder="Search" v-model="filterCon">
+                                    <span class="input-group-addon glyphicon glyphicon-search"></span>
+                                </div>
+
+                                <ul class="list-group">
+                                    <li class="list-group-item {{ item.State }}" v-for="item in containers | filterBy filterCon in 'Name' 'Image' 'State'" track-by="Id">
+                                        <a v-link="{ name: 'container', params: { id: item.Id }}">
+                                            <span class="list-item list-item-title">
+                                                <span class="glyphicon {{ item.State | statusGlyph }}"></span>
+                                                <span class="name"><strong>{{ item.Name }}</strong></span>
+                                                <span><small>Id:</small> {{ item.Id | truncate '12' }}</span> &bull;
+                                                <span><small>Image:</small> {{ item.Image }}</span>
+                                            </span>
+                                            <span class="row list-item list-item-body">
+                                                <span class="col-xs-9 left">
+                                                    <span><small>Command:</small> {{ item.Command }}</span>
+                                                    <span v-if="item.IpAddress"><small>IP:</small> {{ item.IpAddress }}</span>
+                                                    <span v-if="item.Ports"><small>Ports:</small> {{ item.Ports }}</span>
+                                                    <span><small>Status:</small> {{ item.Status }}</span>
+                                                </span>
+                                                <span class="col-xs-3 right">
+                                                    <span><small>Created</small> <br />{{ item.Created }}</span>
+                                                    <small class="list-item-link">Details <span class="glyphicon glyphicon-chevron-right"></span></small>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div role="tabpanel" class="tab-pane" id="imagesList">
+                                <div class="input-group search">
+                                    <input type="text" class="form-control" placeholder="Search images" v-model="filterImg">
+                                    <span class="input-group-addon glyphicon glyphicon-search"></span>
+                                </div>
+                                <ul class="list-group" v-if="images">
+                                    <li class="list-group-item running" v-for="item in images | filterBy filterImg in 'RepoTags' 'Labels'" track-by="Id">
+                                        <a>
+                                            <span class="list-item list-item-title">
+                                                <span class="glyphicon glyphicon-book"></span>
+                                                <span class="name"><strong>{{ item.Name }}</strong></span>
+                                            </span>
+                                            <span class="row list-item list-item-body">
+                                                <span class="col-xs-9 left">
+                                                    <span><small>RepoTags:</small> {{ item.RepoTags }}</span>
+                                                    <span><small>Size:</small> {{ item.Size }}</span>
+                                                    <span><small>VirtualSize:</small> {{ item.VirtualSize }}</span>
+                                                    <span v-if="item.ParentID"><small>ParentID:</small> {{ item.ParentID | truncate '12' }}</span>
+                                                    <span v-if="item.Labels"><small>Labels:</small> {{ item.Labels }}</span>
+                                                </span>
+                                                <span class="col-xs-3 right">
+                                                    <span><small>Created</small> <br />{{ item.Created }}</span>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div role="tabpanel" class="tab-pane" id="netList">
+                                <div class="input-group search">
+                                    <input type="text" class="form-control" placeholder="Search networks" v-model="filterNet">
+                                    <span class="input-group-addon glyphicon glyphicon-search"></span>
+                                </div>
+                                <ul class="list-group" v-if="networks">
+                                    <li class="list-group-item running" v-for="item in networks | filterBy filterNet in 'Name' 'Driver' 'Scope'" track-by="Id">
+                                        <a>
+                                            <span class="list-item list-item-title">
+                                                <span class="glyphicon glyphicon-signal"></span>
+                                                <span class="name"><strong>{{ item.Name }}</strong></span>
+                                            </span>
+                                            <span class="row list-item list-item-body">
+                                                <span class="col-xs-9 left">
+                                                    <span><small>Scope:</small> {{ item.Scope }}</span>
+                                                    <span><small>Driver:</small> {{ item.Driver }}</span>
+                                                </span>
+                                                <span class="col-xs-3 right">
+                                                    <span><small>Containers</small> <br />{{ item.Containers }}</span>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="container" type="x-template">
+    <div class="js-container" v-cloak>
+        <div class="row">
+            <div class="col-lg-5 col-md-5" v-if="con">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading master">
+                                <h3 class="panel-title"><span class="glyphicon glyphicon-star"></span> {{ con.Name }}</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="two-cols-stats">
+                                    <span>
+                                        <strong>{{ con.Id | truncate '12' }}</strong> Id
+                                    </span>
+                                    <span>
+                                        <strong>{{ con.State }}</strong> State
+                                    </span>
+                                    <span>
+                                        <strong>{{ con.Created }}</strong> Created at
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default" v-if="mem">
+                            <div class="panel-heading master">
+                                <h3 class="panel-title"><span class="glyphicon glyphicon-signal"></span> Stats</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="two-cols-stats">
+                                    <span>
+                                        <strong>{{ con.StartedAt }}</strong> Started at
+                                    </span>
+                                    <span>
+                                        <strong>{{ pids }}</strong> Pids
+                                    </span>
+                                    <span>
+                                        <strong>{{ mem }}</strong> Memory
+                                    </span>
+                                    <span>
+                                        <strong>{{ rxTotal }}</strong> Network in total
+                                    </span>
+                                    <span>
+                                        <strong>{{ txTotal }}</strong> Network out total
+                                    </span>
+                                    <span>
+                                        <strong>{{ cpuTime }}</strong> CPU total time
+                                    </span>
+                                    <span>
+                                        <strong>{{ iorxTotal }}</strong> IO read total
+                                    </span>
+                                    <span>
+                                        <strong>{{ iotxTotal }}</strong> IO write total
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel panel-default" style="display:none;">
+                            <div class="panel-heading master">
+                                <h3 class="panel-title"><span class="glyphicon glyphicon-signal"></span> Memory {{ mem }}</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div>
+                                    <canvas id="lineChart" height="100" width="300"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7 col-md-7 json-pannels" v-if="con">
+                <div class="page-container">
+                    <div role="tabpanel">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#props" aria-controls="props" role="tab" data-toggle="tab">Props</a></li>
+                            <li role="presentation"><a href="#logs" aria-controls="logs" role="tab" data-toggle="tab">Logs</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="props">
+                                <div class="about">
+                                    <ul>
+                                        <li v-if="con.FinishedAt">
+                                            <small>Finished at:</small>
+                                            <span>{{ con.FinishedAt }}</span>
+                                        </li>
+                                        <li>
+                                            <small>Image:</small>
+                                            <span>{{ con.Image }}</span>
+                                        </li>
+                                        <li v-if="con.Command">
+                                            <small>Command:</small>
+                                            <span>{{ con.Command }}</span>
+                                        </li>
+                                        <li v-if="con.Path">
+                                            <small>Path:</small>
+                                            <span>{{ con.Path }}</span>
+                                        </li>
+                                        <li v-for="entry in con.Entrypoint">
+                                            <small>Entrypoint:</small>
+                                            <span>{{ entry }}</span>
+                                        </li>
+                                        <li v-if="con.WorkingDir">
+                                            <small>WorkingDir:</small>
+                                            <span class="break">{{ con.WorkingDir}}</span>
+                                        </li>
+                                        <li v-for="env in con.Env">
+                                            <small>Env:</small>
+                                            <span class="break">{{ env }}</span>
+                                        </li>
+                                        <li v-if="con.Ports">
+                                            <small>Ports:</small>
+                                            <span>{{ con.Ports }}</span>
+                                        </li>
+                                        <li v-for="net in con.Networks">
+                                            <small>Network:</small>
+                                            <span>{{ net }}</span>
+                                        </li>
+                                        <li v-for="mount in con.Mounts">
+                                            <small>Mount:</small>
+                                            <span class="break">{{ mount }}</span>
+                                        </li>
+                                        <li>
+                                            <small>Driver:</small>
+                                            <span>{{ con.Driver }}</span>
+                                        </li>
+                                        <li>
+                                            <small>Restarts:</small>
+                                            <span>{{ con.RestartCount }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="logs">
+                                <pre id="logViewer">{{ logs }}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="about" type="x-template">
+    <div class="about page-container">
+        <ul>
+            <li>
+                <small>Project:</small>
+                <span>DockerDash</span>
+            </li>
+            <li>
+                <small>Version:</small>
+                <span>@Microsoft.Extensions.PlatformAbstractions.PlatformServices.Default.Application.ApplicationVersion</span>
+            </li>
+            <li>
+                <small>Copyright:</small>
+                <span><a href="https://stefanprodan.com">Stefan Prodan</a></span>
+            </li>
+            <li>
+                <small>Code:</small>
+                <span><a href="https://github.com/stefanprodan/dockerdash">GitHub Repository</a></span>
+            </li>
+            <li>
+                <small>Support:</small>
+                <span><a href="https://github.com/stefanprodan/dockerdash/issues">Issue tracker</a></span>
+            </li>
+            <li>
+                <small>License:</small>
+                <span><a href="https://github.com/stefanprodan/dockerdash/blob/master/LICENSE">MIT License</a></span>
+            </li>
+            <li>
+                <small>Logo:</small>
+                <span>Icon made by <a href="http://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></span>
+            </li>
+        </ul>
+    </div>
+</script>

@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Language" content="en">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title v-if="!$route.title">DockerDash</title>
+    <template v-else>
+        <title>{{ $route.title }} - DockerDash</title>
+    </template>
+    <link rel="icon" type="image/png" href="~/images/logo.png" sizes="16x16">
+    <environment names="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+    </environment>
+    <environment names="Staging,Production">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+</head>
+<body>
+    <div id="app">
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a v-link="{name: 'host'}" class="navbar-brand"><img src="~/images/logo.svg" height="35px" style="margin-top: -6px;" /></a>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li v-link-active><a v-link="{name: 'host'}">Host</a></li>
+                        <li v-link-active><a v-link="{name: 'about'}">About</a></li>
+
+                    </ul>
+                    <ul class="nav navbar-nav pull-right" v-if="authenticated" v-cloak>
+                        <li><a href="#" v-on:click="logout()">Logout</a></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        <div class="container body-content">
+            @RenderBody()
+            <router-view></router-view>
+        </div>
+    </div>
+
+    <environment names="Development">
+        <script src="~/app/lib.js" asp-append-version="true"></script>
+        <script src="~/signalr/hubs"></script>
+        <script src="~/app/app.js" asp-append-version="true"></script>
+    </environment>
+    <environment names="Staging,Production">
+        <script src="~/app/lib.js" asp-append-version="true"></script>
+        <script src="~/signalr/hubs"></script>
+        <script src="~/app/app.min.js" asp-append-version="true"></script>
+    </environment>
+</body>
+</html>
